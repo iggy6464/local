@@ -1,0 +1,624 @@
+{
+  "nodes": [
+    {
+      "id": "overview",
+      "title": "Overview",
+      "type": "overview",
+      "tags": [],
+      "location": "root"
+    },
+    {
+      "id": "index",
+      "title": "Index",
+      "type": "index",
+      "tags": [],
+      "location": "root"
+    },
+    {
+      "id": "CP1-Building",
+      "title": "CP1 Building",
+      "type": "entity",
+      "tags": [
+        "building",
+        "common-process",
+        "deadline-CW40"
+      ],
+      "location": "entities"
+    },
+    {
+      "id": "Construction-Maven",
+      "title": "Construction Maven",
+      "type": "entity",
+      "tags": [
+        "tool",
+        "AI",
+        "platform",
+        "risk-management"
+      ],
+      "location": "entities"
+    },
+    {
+      "id": "BSI-K-ENSOL",
+      "title": "BSI K-ENSOL Project",
+      "type": "entity",
+      "tags": [
+        "project",
+        "EPC",
+        "battery-factory",
+        "Spain"
+      ],
+      "location": "entities"
+    },
+    {
+      "id": "GEMTECH",
+      "title": "GEMTECH",
+      "type": "entity",
+      "tags": [
+        "subcontractor",
+        "civil",
+        "architecture"
+      ],
+      "location": "entities"
+    },
+    {
+      "id": "MTL-Dashboard",
+      "title": "MTL Dashboard",
+      "type": "entity",
+      "tags": [
+        "tool",
+        "dashboard",
+        "HTML",
+        "material-tracking"
+      ],
+      "location": "entities"
+    },
+    {
+      "id": "SOLTEC",
+      "title": "SOLTEC",
+      "type": "entity",
+      "tags": [
+        "subcontractor",
+        "electrical",
+        "instrumentation",
+        "BMS"
+      ],
+      "location": "entities"
+    },
+    {
+      "id": "FA1-Building",
+      "title": "FA1 Building",
+      "type": "entity",
+      "tags": [
+        "building",
+        "factory",
+        "deadline-CW33"
+      ],
+      "location": "entities"
+    },
+    {
+      "id": "project-knowledge-overview",
+      "title": "Project Knowledge Overview",
+      "type": "synthesis",
+      "tags": [
+        "overview",
+        "cross-cutting"
+      ],
+      "location": "syntheses"
+    },
+    {
+      "id": "cdr-status-dashboard",
+      "title": "CDR Status Dashboard",
+      "type": "source",
+      "tags": [
+        "dashboard",
+        "CDR",
+        "construction-readiness"
+      ],
+      "location": "sources"
+    },
+    {
+      "id": "schedule-conflict-optimization",
+      "title": "Schedule Conflict Optimization",
+      "type": "source",
+      "tags": [
+        "schedule",
+        "clash-detection",
+        "trade-sequencing",
+        "SCN"
+      ],
+      "location": "sources"
+    },
+    {
+      "id": "mtl-dashboard-development",
+      "title": "MTL Dashboard 개발 이력",
+      "type": "source",
+      "tags": [
+        "dashboard",
+        "material",
+        "tracking",
+        "HTML",
+        "JavaScript"
+      ],
+      "location": "sources"
+    },
+    {
+      "id": "colleague-skill-epc-adaptation",
+      "title": "colleague.skill EPC Adaptation",
+      "type": "source",
+      "tags": [
+        "AI",
+        "knowledge-management",
+        "tacit-knowledge",
+        "skill-framework"
+      ],
+      "location": "sources"
+    },
+    {
+      "id": "cw16-cw20-catchup-plan",
+      "title": "CW16~CW20 Catch-Up Plan Analysis",
+      "type": "source",
+      "tags": [
+        "catch-up",
+        "material-gap",
+        "manpower",
+        "SOLTEC",
+        "LLI"
+      ],
+      "location": "sources"
+    },
+    {
+      "id": "construction-maven-system",
+      "title": "Construction Maven System",
+      "type": "source",
+      "tags": [
+        "AI",
+        "risk-management",
+        "DoD-Maven",
+        "OCR"
+      ],
+      "location": "sources"
+    },
+    {
+      "id": "Material-Pipeline-Logic",
+      "title": "Material Pipeline Logic",
+      "type": "concept",
+      "tags": [
+        "material",
+        "pipeline",
+        "tracking",
+        "5-stage"
+      ],
+      "location": "concepts"
+    },
+    {
+      "id": "Critical-Path-Method",
+      "title": "Critical Path Method",
+      "type": "concept",
+      "tags": [
+        "CPM",
+        "scheduling",
+        "float",
+        "forward-pass",
+        "backward-pass"
+      ],
+      "location": "concepts"
+    },
+    {
+      "id": "I-MR-Analysis",
+      "title": "I-MR Analysis",
+      "type": "concept",
+      "tags": [
+        "SPC",
+        "statistics",
+        "forecasting",
+        "quality-control"
+      ],
+      "location": "concepts"
+    },
+    {
+      "id": "Trade-Sequencing",
+      "title": "Trade Sequencing",
+      "type": "concept",
+      "tags": [
+        "MEP",
+        "clash-detection",
+        "scheduling",
+        "zone-rolling"
+      ],
+      "location": "concepts"
+    },
+    {
+      "id": "FIDIC-Silver-Book",
+      "title": "FIDIC Silver Book",
+      "type": "concept",
+      "tags": [
+        "contract",
+        "FIDIC",
+        "EPC",
+        "risk-allocation"
+      ],
+      "location": "concepts"
+    },
+    {
+      "id": "CDR-Readiness-Milestone",
+      "title": "CDR Readiness Milestone",
+      "type": "concept",
+      "tags": [
+        "CDR",
+        "milestone",
+        "invariant",
+        "start-date"
+      ],
+      "location": "concepts"
+    },
+    {
+      "id": "LLI-Criticality",
+      "title": "LLI Criticality Assessment",
+      "type": "concept",
+      "tags": [
+        "LLI",
+        "long-lead",
+        "procurement",
+        "tiering"
+      ],
+      "location": "concepts"
+    },
+    {
+      "id": "EPC-Domain-Invariants",
+      "title": "EPC Domain Invariants",
+      "type": "concept",
+      "tags": [
+        "invariant",
+        "domain-rule",
+        "verification"
+      ],
+      "location": "concepts"
+    }
+  ],
+  "edges": [
+    {
+      "source": "overview",
+      "target": "FA1-Building"
+    },
+    {
+      "source": "overview",
+      "target": "CP1-Building"
+    },
+    {
+      "source": "overview",
+      "target": "MTL-Dashboard"
+    },
+    {
+      "source": "overview",
+      "target": "Material-Pipeline-Logic"
+    },
+    {
+      "source": "overview",
+      "target": "SOLTEC"
+    },
+    {
+      "source": "overview",
+      "target": "LLI-Criticality"
+    },
+    {
+      "source": "overview",
+      "target": "Critical-Path-Method"
+    },
+    {
+      "source": "overview",
+      "target": "Trade-Sequencing"
+    },
+    {
+      "source": "overview",
+      "target": "I-MR-Analysis"
+    },
+    {
+      "source": "overview",
+      "target": "CDR-Readiness-Milestone"
+    },
+    {
+      "source": "overview",
+      "target": "Construction-Maven"
+    },
+    {
+      "source": "overview",
+      "target": "EPC-Domain-Invariants"
+    },
+    {
+      "source": "overview",
+      "target": "FIDIC-Silver-Book"
+    },
+    {
+      "source": "index",
+      "target": "mtl-dashboard-development"
+    },
+    {
+      "source": "index",
+      "target": "cdr-status-dashboard"
+    },
+    {
+      "source": "index",
+      "target": "construction-maven-system"
+    },
+    {
+      "source": "index",
+      "target": "cw16-cw20-catchup-plan"
+    },
+    {
+      "source": "index",
+      "target": "schedule-conflict-optimization"
+    },
+    {
+      "source": "index",
+      "target": "colleague-skill-epc-adaptation"
+    },
+    {
+      "source": "index",
+      "target": "BSI-K-ENSOL"
+    },
+    {
+      "source": "index",
+      "target": "FA1-Building"
+    },
+    {
+      "source": "index",
+      "target": "CP1-Building"
+    },
+    {
+      "source": "index",
+      "target": "GEMTECH"
+    },
+    {
+      "source": "index",
+      "target": "SOLTEC"
+    },
+    {
+      "source": "index",
+      "target": "MTL-Dashboard"
+    },
+    {
+      "source": "index",
+      "target": "Construction-Maven"
+    },
+    {
+      "source": "index",
+      "target": "Critical-Path-Method"
+    },
+    {
+      "source": "index",
+      "target": "FIDIC-Silver-Book"
+    },
+    {
+      "source": "index",
+      "target": "CDR-Readiness-Milestone"
+    },
+    {
+      "source": "index",
+      "target": "I-MR-Analysis"
+    },
+    {
+      "source": "index",
+      "target": "LLI-Criticality"
+    },
+    {
+      "source": "index",
+      "target": "Material-Pipeline-Logic"
+    },
+    {
+      "source": "index",
+      "target": "EPC-Domain-Invariants"
+    },
+    {
+      "source": "index",
+      "target": "Trade-Sequencing"
+    },
+    {
+      "source": "index",
+      "target": "project-knowledge-overview"
+    },
+    {
+      "source": "CP1-Building",
+      "target": "BSI-K-ENSOL"
+    },
+    {
+      "source": "CP1-Building",
+      "target": "FA1-Building"
+    },
+    {
+      "source": "Construction-Maven",
+      "target": "FIDIC-Silver-Book"
+    },
+    {
+      "source": "BSI-K-ENSOL",
+      "target": "FA1-Building"
+    },
+    {
+      "source": "BSI-K-ENSOL",
+      "target": "CP1-Building"
+    },
+    {
+      "source": "BSI-K-ENSOL",
+      "target": "GEMTECH"
+    },
+    {
+      "source": "BSI-K-ENSOL",
+      "target": "SOLTEC"
+    },
+    {
+      "source": "BSI-K-ENSOL",
+      "target": "FIDIC-Silver-Book"
+    },
+    {
+      "source": "MTL-Dashboard",
+      "target": "Material-Pipeline-Logic"
+    },
+    {
+      "source": "MTL-Dashboard",
+      "target": "I-MR-Analysis"
+    },
+    {
+      "source": "SOLTEC",
+      "target": "FA1-Building"
+    },
+    {
+      "source": "FA1-Building",
+      "target": "SOLTEC"
+    },
+    {
+      "source": "FA1-Building",
+      "target": "CDR-Readiness-Milestone"
+    },
+    {
+      "source": "FA1-Building",
+      "target": "BSI-K-ENSOL"
+    },
+    {
+      "source": "FA1-Building",
+      "target": "CP1-Building"
+    },
+    {
+      "source": "project-knowledge-overview",
+      "target": "MTL-Dashboard"
+    },
+    {
+      "source": "project-knowledge-overview",
+      "target": "Critical-Path-Method"
+    },
+    {
+      "source": "project-knowledge-overview",
+      "target": "I-MR-Analysis"
+    },
+    {
+      "source": "project-knowledge-overview",
+      "target": "LLI-Criticality"
+    },
+    {
+      "source": "project-knowledge-overview",
+      "target": "EPC-Domain-Invariants"
+    },
+    {
+      "source": "cdr-status-dashboard",
+      "target": "CDR-Readiness-Milestone"
+    },
+    {
+      "source": "cdr-status-dashboard",
+      "target": "FA1-Building"
+    },
+    {
+      "source": "cdr-status-dashboard",
+      "target": "CP1-Building"
+    },
+    {
+      "source": "schedule-conflict-optimization",
+      "target": "Trade-Sequencing"
+    },
+    {
+      "source": "mtl-dashboard-development",
+      "target": "MTL-Dashboard"
+    },
+    {
+      "source": "mtl-dashboard-development",
+      "target": "Material-Pipeline-Logic"
+    },
+    {
+      "source": "mtl-dashboard-development",
+      "target": "LLI-Criticality"
+    },
+    {
+      "source": "mtl-dashboard-development",
+      "target": "CDR-Readiness-Milestone"
+    },
+    {
+      "source": "colleague-skill-epc-adaptation",
+      "target": "Construction-Maven"
+    },
+    {
+      "source": "colleague-skill-epc-adaptation",
+      "target": "Construction-Maven"
+    },
+    {
+      "source": "cw16-cw20-catchup-plan",
+      "target": "SOLTEC"
+    },
+    {
+      "source": "cw16-cw20-catchup-plan",
+      "target": "FA1-Building"
+    },
+    {
+      "source": "cw16-cw20-catchup-plan",
+      "target": "LLI-Criticality"
+    },
+    {
+      "source": "cw16-cw20-catchup-plan",
+      "target": "LLI-Criticality"
+    },
+    {
+      "source": "cw16-cw20-catchup-plan",
+      "target": "SOLTEC"
+    },
+    {
+      "source": "construction-maven-system",
+      "target": "FIDIC-Silver-Book"
+    },
+    {
+      "source": "construction-maven-system",
+      "target": "Construction-Maven"
+    },
+    {
+      "source": "construction-maven-system",
+      "target": "Critical-Path-Method"
+    },
+    {
+      "source": "construction-maven-system",
+      "target": "FIDIC-Silver-Book"
+    },
+    {
+      "source": "Material-Pipeline-Logic",
+      "target": "MTL-Dashboard"
+    },
+    {
+      "source": "Material-Pipeline-Logic",
+      "target": "EPC-Domain-Invariants"
+    },
+    {
+      "source": "Critical-Path-Method",
+      "target": "Trade-Sequencing"
+    },
+    {
+      "source": "Critical-Path-Method",
+      "target": "CDR-Readiness-Milestone"
+    },
+    {
+      "source": "Trade-Sequencing",
+      "target": "Critical-Path-Method"
+    },
+    {
+      "source": "FIDIC-Silver-Book",
+      "target": "EPC-Domain-Invariants"
+    },
+    {
+      "source": "CDR-Readiness-Milestone",
+      "target": "EPC-Domain-Invariants"
+    },
+    {
+      "source": "LLI-Criticality",
+      "target": "SOLTEC"
+    },
+    {
+      "source": "LLI-Criticality",
+      "target": "SOLTEC"
+    },
+    {
+      "source": "EPC-Domain-Invariants",
+      "target": "CDR-Readiness-Milestone"
+    },
+    {
+      "source": "EPC-Domain-Invariants",
+      "target": "Material-Pipeline-Logic"
+    },
+    {
+      "source": "EPC-Domain-Invariants",
+      "target": "CDR-Readiness-Milestone"
+    }
+  ]
+}

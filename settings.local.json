@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(py *)",
+      "Bash(cp \"C:/Users/iggy6/OneDrive/Desktop/2026_04 APR/CW16\\(13~17\\)/Daily/0415Daily Progress Report K-ENSOL_SF.VA.xlsx\" /tmp/rpt.xlsx)",
+      "Read(//tmp/**)",
+      "Bash(python analyze_progress.py)",
+      "Bash(where python *)",
+      "Bash(where python3 *)",
+      "Bash(where py *)",
+      "Bash(C:\\\\Users\\\\iggy6\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\python.exe *)",
+      "Bash(ls *)"
+    ]
+  }
+}

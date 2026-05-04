@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SF.VA Project - FA+CP Schedule Dashboard (EPC + Milestone)</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
+.header{background:linear-gradient(135deg,#1e293b,#334155);padding:18px 28px;border-bottom:2px solid #3b82f6;display:flex;justify-content:space-between;align-items:center}
+.header h1{font-size:20px;color:#60a5fa;font-weight:600}
+.header .subtitle{color:#94a3b8;font-size:12px;margin-top:2px}
+.header .badges{display:flex;gap:8px;align-items:center}
+.header .date-badge{background:#1e40af;color:#93c5fd;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:500}
+.container{display:flex;height:calc(100vh - 72px)}
+.sidebar{width:270px;background:#1e293b;border-right:1px solid #334155;overflow-y:auto;flex-shrink:0}
+.sidebar h3{padding:12px 14px 6px;color:#64748b;font-size:10px;text-transform:uppercase;letter-spacing:1px}
+.zone-btn{padding:5px 14px 5px 18px;color:#94a3b8;font-size:11px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-left:2px solid transparent;transition:all .15s}
+.zone-btn:hover{background:#334155;color:#e2e8f0}
+.zone-btn.active{background:#1e3a5f;color:#60a5fa;border-left-color:#3b82f6}
+.floor-tag{font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700}
+.floor-gf{background:#065f46;color:#34d399}
+.floor-ff{background:#7c2d12;color:#fb923c}
+.main{flex:1;overflow-y:auto;padding:18px 22px}
+.epc-tabs{display:flex;gap:0;margin-bottom:18px;background:#0f172a;border-radius:8px;padding:3px;border:1px solid #334155}
+.epc-tab{flex:1;padding:10px 0;text-align:center;cursor:pointer;border-radius:6px;font-size:12px;font-weight:600;transition:all .2s;position:relative}
+.epc-tab:hover{background:#1e293b}
+.epc-tab.active-all{background:#334155;color:#f1f5f9}
+.epc-tab.active-e{background:linear-gradient(135deg,#4338ca,#6366f1);color:#e0e7ff}
+.epc-tab.active-p{background:linear-gradient(135deg,#b45309,#d97706);color:#fef3c7}
+.epc-tab.active-c{background:linear-gradient(135deg,#047857,#059669);color:#d1fae5}
+.epc-tab .count{display:block;font-size:18px;font-weight:700;margin-top:2px}
+.epc-tab .label{font-size:10px;opacity:.7;text-transform:uppercase;letter-spacing:.5px}
+.summary-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.card{background:#1e293b;border-radius:8px;padding:12px 14px;border:1px solid #334155}
+.card .label{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
+.card .value{font-size:20px;font-weight:700;color:#f1f5f9;margin-top:3px}
+.card .sub{font-size:10px;color:#94a3b8;margin-top:2px}
+.card.critical{border-color:#dc2626}.card.critical .value{color:#ef4444}
+.section-title{font-size:14px;font-weight:600;color:#cbd5e1;margin:18px 0 8px;padding-bottom:5px;border-bottom:1px solid #334155}
+
+/* Milestone Banner */
+.ms-banner{background:linear-gradient(135deg,#7f1d1d,#991b1b);border:2px solid #ef4444;border-radius:10px;padding:16px 20px;margin-bottom:18px;position:relative;overflow:hidden}
+.ms-banner::before{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;background:rgba(239,68,68,.15);border-radius:50%}
+.ms-banner::after{content:'';position:absolute;bottom:-10px;right:40px;width:40px;height:40px;background:rgba(239,68,68,.1);border-radius:50%}
+.ms-banner .ms-icon{font-size:28px;margin-right:12px;vertical-align:middle}
+.ms-banner .ms-title{font-size:14px;font-weight:700;color:#fecaca;letter-spacing:.5px}
+.ms-banner .ms-dates{display:flex;gap:24px;margin-top:10px;flex-wrap:wrap}
+.ms-date-item{background:rgba(0,0,0,.3);padding:8px 14px;border-radius:6px;border:1px solid rgba(239,68,68,.4)}
+.ms-date-item .ms-label{font-size:9px;color:#fca5a5;text-transform:uppercase;letter-spacing:.5px}
+.ms-date-item .ms-val{font-size:18px;font-weight:800;color:#ffffff;margin-top:2px;font-variant-numeric:tabular-nums}
+.ms-date-item .ms-sub{font-size:9px;color:#f87171;margin-top:1px}
+
+/* Gantt */
+.gantt-container{background:#1e293b;border-radius:8px;border:1px solid #334155;overflow:hidden;margin-bottom:14px}
+.gantt-header{display:flex;background:#0f172a;border-bottom:1px solid #334155;position:sticky;top:0;z-index:2}
+.gantt-label-col{width:280px;min-width:280px;padding:7px 10px;font-size:10px;color:#64748b;font-weight:600;border-right:1px solid #334155}
+.gantt-timeline{flex:1;display:flex;position:relative}
+.gantt-month{flex:1;text-align:center;padding:5px 0;font-size:9px;color:#64748b;border-right:1px solid #1e293b}
+.gantt-row{display:flex;border-bottom:1px solid #1e293b;min-height:30px;transition:background .1s}
+.gantt-row:hover{background:#334155}
+.gantt-row.critical-row{background:#7f1d1d22}
+.gantt-row.near-critical-row{background:#78350f22}
+.gantt-name{width:280px;min-width:280px;padding:5px 10px;font-size:10px;color:#cbd5e1;border-right:1px solid #1e293b;display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cp-badge{font-size:8px;padding:1px 4px;border-radius:3px;font-weight:700;flex-shrink:0}
+.cp-badge.cp{background:#dc2626;color:#fecaca}
+.cp-badge.nc{background:#d97706;color:#fef3c7}
+.gantt-bars{flex:1;position:relative;padding:3px 0}
+.bar{position:absolute;height:22px;border-radius:4px;top:3px;min-width:3px;cursor:pointer;transition:opacity .15s}
+.bar:hover{opacity:.85;box-shadow:0 0 8px rgba(96,165,250,.4)}
+.bar-tooltip{display:none;position:absolute;background:#0f172a;border:1px solid #3b82f6;border-radius:6px;padding:8px 12px;z-index:100;font-size:10px;color:#e2e8f0;min-width:200px;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+.bar:hover .bar-tooltip{display:block;bottom:28px;left:0}
+
+/* Milestone line in gantt */
+.ms-line{position:absolute;top:0;bottom:0;width:3px;background:#ef4444;z-index:1;pointer-events:none}
+.ms-line::before{content:'';position:absolute;top:-2px;left:-6px;width:15px;height:15px;background:#ef4444;transform:rotate(45deg);border:2px solid #fecaca;z-index:2}
+.ms-line::after{content:attr(data-label);position:absolute;top:-20px;left:8px;font-size:9px;color:#fecaca;white-space:nowrap;font-weight:700;background:#7f1d1d;padding:1px 5px;border-radius:3px;z-index:3}
+.ms-line-finish{position:absolute;top:0;bottom:0;width:2px;background:#f97316;z-index:1;pointer-events:none;border-left:2px dashed #f97316}
+.ms-line-finish::after{content:attr(data-label);position:absolute;bottom:-18px;left:6px;font-size:8px;color:#fdba74;white-space:nowrap;font-weight:600;z-index:3}
+
+/* MS Overlay for gantt-bars container */
+.gantt-bars-wrap{flex:1;position:relative;overflow:hidden}
+
+/* CP Summary */
+.cp-summary{background:#1e293b;border:1px solid #dc2626;border-radius:8px;padding:14px;margin-bottom:16px}
+.cp-summary h3{color:#ef4444;font-size:13px;margin-bottom:8px}
+.cp-table{width:100%;border-collapse:collapse;font-size:11px}
+.cp-table th{text-align:left;padding:5px 8px;color:#64748b;border-bottom:1px solid #334155;font-weight:600}
+.cp-table td{padding:5px 8px;color:#cbd5e1;border-bottom:1px solid #1e293b}
+.cp-table tr.critical td{color:#fca5a5}
+.cp-table tr.near-critical td{color:#fcd34d}
+.risk-high{color:#ef4444;font-weight:600}
+.risk-med{color:#f59e0b;font-weight:600}
+.risk-low{color:#22c55e}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;padding:8px 12px;background:#1e293b;border-radius:6px;border:1px solid #334155}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:10px;color:#94a3b8}
+.legend-color{width:12px;height:12px;border-radius:3px}
+.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.zone-card{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:12px;cursor:pointer;transition:all .15s}
+.zone-card:hover{border-color:#3b82f6;transform:translateY(-1px)}
+.zone-card h4{color:#60a5fa;font-size:12px;margin-bottom:4px}
+.zone-card .info{font-size:10px;color:#94a3b8;line-height:1.6}
+.zone-card .ms-tag{font-size:10px;color:#fca5a5;font-weight:700;background:#7f1d1d;padding:2px 7px;border-radius:4px;display:inline-block;margin-top:4px}
+.epc-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;margin-top:6px;background:#0f172a}
+.epc-bar .seg-e{background:#6366f1}.epc-bar .seg-p{background:#d97706}.epc-bar .seg-c{background:#059669}
+.epc-mini{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:2px}
+.compare-table{width:100%;border-collapse:collapse;background:#1e293b;border-radius:8px;overflow:hidden;border:1px solid #334155;font-size:11px}
+.compare-table th{background:#0f172a;padding:8px;color:#64748b;text-align:left;border-bottom:1px solid #334155}
+.compare-table td{padding:6px 8px;color:#cbd5e1;border-bottom:1px solid #1e293b}
+.compare-table tr:hover td{background:#33415540}
+
+/* Milestone summary table */
+.ms-summary-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:18px}
+.ms-summary-table th{background:#7f1d1d;color:#fecaca;padding:8px 10px;text-align:left;font-weight:600;border-bottom:2px solid #ef4444}
+.ms-summary-table td{padding:7px 10px;border-bottom:1px solid #1e293b;color:#e2e8f0}
+.ms-summary-table tr:hover td{background:#7f1d1d33}
+.ms-summary-table .ms-date{font-weight:800;font-size:13px;color:#fca5a5;font-variant-numeric:tabular-nums}
+.ms-summary-table .days-left{font-weight:700;font-size:12px}
+.days-left.urgent{color:#ef4444}
+.days-left.warning{color:#f59e0b}
+.days-left.ok{color:#22c55e}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <h1>SF.VA Project &mdash; FA+CP 2027 Schedule Dashboard</h1>
+    <div class="subtitle">K-ENSOL/BSI Battery Factory | EPC Phase View + Equipment Move-in Milestones</div>
+  </div>
+  <div class="badges">
+    <div class="date-badge" style="background:#7f1d1d;color:#fecaca">&#9670; Equipment Move-in Tracked</div>
+    <div class="date-badge">Status: 2026-04-20</div>
+  </div>
+</div>
+<div class="container">
+  <div class="sidebar">
+    <h3>Navigation</h3>
+    <div class="zone-btn" onclick="showOverview()" id="btn-overview">&#9670; All Zones + Milestones</div>
+    <div class="zone-btn" onclick="showComparison()" id="btn-compare">EPC Comparison Table</div>
+    <div class="zone-btn" onclick="showMilestoneTimeline()" id="btn-ms-timeline" style="color:#fca5a5">&#9670; Milestone Timeline</div>
+    <h3>FA1 Building (Assembly)</h3>
+    <div id="fa1-zones"></div>
+    <h3>CP1 Building (Cell Process)</h3>
+    <div id="cp1-zones"></div>
+  </div>
+  <div class="main" id="main-content"></div>
+</div>
+<script>
+const DATA = {"zones": {"CP1(Assembly)|GF": {"zone": "CP1(Assembly)", "floor": "GF", "building": "CP1", "epc_counts": {"E": 5, "P": 168, "C": 237}, "ALL": {"min_start": "2025-09-04", "max_finish": "2027-11-01", "total": 410, "phases": [{"name": "3-1. HVAC Equipment Manufacturing", "start": "2025-09-04", "finish": "2026-10-08", "count": 85, "workdays": 4163, "contractors": ["Stulz", "JOSEM", "CAMPIL"]}, {"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-10-04", "count": 88, "workdays": 1525, "contractors": ["Soler", "TOP", "LJ", "KNS", "GEM Tech", "Jeremias", "Hwyun", "Synerge", "SICA"]}, {"name": "2-2. Construction (Ground Floor)", "start": "2026-04-25", "finish": "2027-02-09", "count": 76, "workdays": 2208, "contractors": ["Soler", "Top", "KNS", "Gem-tech", "Synerge", "SICA"]}, {"name": "2-1. Construction (Mezzanine)", "start": "2026-05-22", "finish": "2027-04-03", "count": 46, "workdays": 3162, "contractors": ["Top", "Synerge"]}, {"name": "4. CDR Readiness for Equipment Move in", "start": "2026-05-22", "finish": "2027-04-25", "count": 13, "workdays": 1238, "contractors": ["KNS"]}, {"name": "3-2. HVAC Equipment Setup", "start": "2026-07-04", "finish": "2026-11-05", "count": 37, "workdays": 256, "contractors": ["Synergy", "TOP"]}, {"name": "3-3. HVAC Equipment install", "start": "2026-09-13", "finish": "2027-05-03", "count": 38, "workdays": 523, "contractors": ["CAMPIL", "Wayun", "JOSEM", "Synergy", "Stulz"]}, {"name": "6. Cold Commissioning", "start": "2027-02-17", "finish": "2027-04-24", "count": 9, "workdays": 141, "contractors": ["Synergy", "LJ"]}, {"name": "5. Hook up", "start": "2027-04-04", "finish": "2027-04-15", "count": 3, "workdays": 11, "contractors": []}, {"name": "7. HOT Commissioning", "start": "2027-04-24", "finish": "2027-06-04", "count": 9, "workdays": 212, "contractors": ["Synergy"]}, {"name": "8. Submission of completion documents", "start": "2027-06-04", "finish": "2027-07-04", "count": 4, "workdays": 120, "contractors": ["KNS", "KNS & Sub con"]}, {"name": "9. VOC environmental permit", "start": "2027-07-04", "finish": "2027-11-01", "count": 2, "workdays": 240, "contractors": ["PWC"]}], "cp": {"critical": [{"name": "9. VOC environmental permit", "start": "2027-07-04", "finish": "2027-11-01", "span": 120, "slack": 0}], "near_critical": []}}, "E": {"min_start": "2026-04-01", "max_finish": "2026-08-02", "total": 5, "phases": [{"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-08-02", "count": 5, "workdays": 305, "contractors": []}], "cp": {"critical": [{"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-08-02", "span": 123, "slack": 0}], "near_critical": []}}, "P": {"min_start": "2025-09-04", "max_finish": "2026-10-08", "total": 168, "phases": [{"name": "3-1. HVAC Equipment Manufacturing", "start": "2025-09-04", "finish": "2026-10-08", "count": 85, "workdays": 4163, "contractors": ["Stulz", "JOSEM", "CAMPIL"]}, {"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-10-04", "count": 83, "workdays": 1220, "contractors": ["Soler", "TOP", "LJ", "KNS", "GEM Tech", "Jeremias", "Hwyun", "Synerge", "SICA"]}], "cp": {"critical": [{"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-10-04", "span": 186, "slack": 4}, {"name": "3-1. HVAC Equipment Manufacturing", "start": "2025-09-04", "finish": "2026-10-08", "span": 399, "slack": 0}], "near_critical": []}}, "C": {"min_start": "2026-04-25", "max_finish": "2027-11-01", "total": 237, "phases": [{"name": "2-2. Construction (Ground Floor)", "start": "2026-04-25", "finish": "2027-02-09", "count": 76, "workdays": 2208, "contractors": ["Soler", "Top", "KNS", "Gem-tech", "Synerge", "SICA"]}, {"name": "2-1. Construction (Mezzanine)", "start": "2026-05-22", "finish": "2027-04-03", "count": 46, "workdays": 3162, "contractors": ["Top", "Synerge"]}, {"name": "4. CDR Readiness for Equipment Move in", "start": "2026-05-22", "finish": "2027-04-25", "count": 13, "workdays": 1238, "contractors": ["KNS"]}, {"name": "3-2. HVAC Equipment Setup", "start": "2026-07-04", "finish": "2026-11-05", "count": 37, "workdays": 256, "contractors": ["Synergy", "TOP"]}, {"name": "3-3. HVAC Equipment install", "start": "2026-09-13", "finish": "2027-05-03", "count": 38, "workdays": 523, "contractors": ["CAMPIL", "Wayun", "JOSEM", "Synergy", "Stulz"]}, {"name": "6. Cold Commissioning", "start": "2027-02-17", "finish": "2027-04-24", "count": 9, "workdays": 141, "contractors": ["Synergy", "LJ"]}, {"name": "5. Hook up", "start": "2027-04-04", "finish": "2027-04-15", "count": 3, "workdays": 11, "contractors": []}, {"name": "7. HOT Commissioning", "start": "2027-04-24", "finish": "2027-06-04", "count": 9, "workdays": 212, "contractors": ["Synergy"]}, {"name": "8. Submission of completion documents", "start": "2027-06-04", "finish": "2027-07-04", "count": 4, "workdays": 120, "contractors": ["KNS", "KNS & Sub con"]}, {"name": "9. VOC environmental permit", "start": "2027-07-04", "finish": "2027-11-01", "count": 2, "workdays": 240, "contractors": ["PWC"]}], "cp": {"critical": [{"name": "9. VOC environmental permit", "start": "2027-07-04", "finish": "2027-11-01", "span": 120, "slack": 0}], "near_critical": []}}}, "CP1(Calendering)|GF": {"zone": "CP1(Calendering)", "floor": "GF", "building": "CP1", "epc_counts": {"E": 5, "P": 142, "C": 225}, "ALL": {"min_start": "2025-09-04", "max_finish": "2027-07-07", "total": 372, "phases": [{"name": "3-1. HVAC Equipment Manufacturing (Mezzanine)", "start": "2025-09-04", "finish": "2027-02-18", "count": 59, "workdays": 2886, "contractors": ["Stulz", "JOSEM", "CAMPIL"]}, {"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-10-20", "count": 88, "workdays": 1597, "contractors": ["Soler", "TOP", "LJ", "KNS", "GEM Tech", "Jeremias", "Hwyun", "Synerge", "SICA"]}, {"name": "2-2. Construction (Ground Floor)", "start": "2026-04-25", "finish": "2026-11-10", "count": 76, "workdays": 1361, "contractors": ["Soler", "Top", "KNS", "Gem-tech", "Synerge", "SICA"]}, {"name": "2-1. Construction (Mezzanine)", "start": "2026-05-05", "finish": "2026-09-29", "count": 46, "workdays": 1095, "contractors": ["Top", "Synerge"]}, {"name": "4. CDR Readiness for Equipment Move in", "start": "2026-05-05", "finish": "2027-01-04", "count": 13, "workdays": 898, "contractors": ["KNS"]}, {"name": "3-2. HVAC Equipment Setup (Mezzanine)", "start": "2026-06-01", "finish": "2026-10-03", "count": 24, "workdays": 128, "contractors": ["Stulz", "JOSEM", "CAMPIL"]}, {"name": "3-3. HVAC Equipment install (Mezzanine)", "start": "2026-08-02", "finish": "2027-02-03", "count": 38, "workdays": 617, "contractors": ["Stulz", "Synergy", "JOSEM"]}, {"name": "6. Cold Commissioning", "start": "2026-11-09", "finish": "2027-02-22", "count": 9, "workdays": 749, "contractors": ["Synergy", "LJ"]}, {"name": "5. Hook up", "start": "2026-12-11", "finish": "2026-12-22", "count": 3, "workdays": 11, "contractors": []}, {"name": "7. HOT Commissioning", "start": "2026-12-22", "finish": "2027-02-07", "count": 9, "workdays": 234, "contractors": ["Synergy"]}, {"name": "8. Submission of completion documents", "start": "2027-02-07", "finish": "2027-07-07", "count": 5, "workdays": 240, "contractors": ["KNS", "KNS & Sub con"]}, {"name": "9. VOC environmental permit", "start": "2027-03-09", "finish": "2027-07-07", "count": 2, "workdays": 240, "contractors": ["PWC"]}], "cp": {"critical": [{"name": "8. Submission of completion documents", "start": "2027-02-07", "finish": "2027-07-07", "span": 150, "slack": 0}, {"name": "9. VOC environmental permit", "start": "2027-03-09", "finish": "2027-07-07", "span": 120, "slack": 0}], "near_critical": []}}, "E": {"min_start": "2026-04-01", "max_finish": "2026-08-18", "total": 5, "phases": [{"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-08-18", "count": 5, "workdays": 345, "contractors": []}], "cp": {"critical": [{"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-08-18", "span": 139, "slack": 0}], "near_critical": []}}, "P": {"min_start": "2025-09-04", "max_finish": "2027-02-18", "total": 142, "phases": [{"name": "3-1. HVAC Equipment Manufacturing (Mezzanine)", "start": "2025-09-04", "finish": "2027-02-18", "count": 59, "workdays": 2886, "contractors": ["Stulz", "JOSEM", "CAMPIL"]}, {"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-10-20", "count": 83, "workdays": 1252, "contractors": ["Soler", "TOP", "LJ", "KNS", "GEM Tech", "Jeremias", "Hwyun", "Synerge", "SICA"]}], "cp": {"critical": [{"name": "3-1. HVAC Equipment Manufacturing (Mezzanine)", "start": "2025-09-04", "finish": "2027-02-18", "span": 532, "slack": 0}], "near_critical": []}}, "C": {"min_start": "2026-04-25", "max_finish": "2027-07-07", "total": 225, "phases": [{"name": "2-2. Construction (Ground Floor)", "start": "2026-04-25", "finish": "2026-11-10", "count": 76, "workdays": 1361, "contractors": ["Soler", "Top", "KNS", "Gem-tech", "Synerge", "SICA"]}, {"name": "2-1. Construction (Mezzanine)", "start": "2026-05-05", "finish": "2026-09-29", "count": 46, "workdays": 1095, "contractors": ["Top", "Synerge"]}, {"name": "4. CDR Readiness for Equipment Move in", "start": "2026-05-05", "finish": "2027-01-04", "count": 13, "workdays": 898, "contractors": ["KNS"]}, {"name": "3-2. HVAC Equipment Setup (Mezzanine)", "start": "2026-06-01", "finish": "2026-10-03", "count": 24, "workdays": 128, "contractors": ["Stulz", "JOSEM", "CAMPIL"]}, {"name": "3-3. HVAC Equipment install (Mezzanine)", "start": "2026-08-02", "finish": "2027-02-03", "count": 38, "workdays": 617, "contractors": ["Stulz", "Synergy", "JOSEM"]}, {"name": "6. Cold Commissioning", "start": "2026-11-09", "finish": "2027-02-22", "count": 9, "workdays": 749, "contractors": ["Synergy", "LJ"]}, {"name": "5. Hook up", "start": "2026-12-11", "finish": "2026-12-22", "count": 3, "workdays": 11, "contractors": []}, {"name": "7. HOT Commissioning", "start": "2026-12-22", "finish": "2027-02-07", "count": 9, "workdays": 234, "contractors": ["Synergy"]}, {"name": "8. Submission of completion documents", "start": "2027-02-07", "finish": "2027-07-07", "count": 5, "workdays": 240, "contractors": ["KNS", "KNS & Sub con"]}, {"name": "9. VOC environmental permit", "start": "2027-03-09", "finish": "2027-07-07", "count": 2, "workdays": 240, "contractors": ["PWC"]}], "cp": {"critical": [{"name": "8. Submission of completion documents", "start": "2027-02-07", "finish": "2027-07-07", "span": 150, "slack": 0}, {"name": "9. VOC environmental permit", "start": "2027-03-09", "finish": "2027-07-07", "span": 120, "slack": 0}], "near_critical": []}}}, "CP1(Coating)|GF": {"zone": "CP1(Coating)", "floor": "GF", "building": "CP1", "epc_counts": {"E": 7, "P": 134, "C": 226}, "ALL": {"min_start": "2025-10-03", "max_finish": "2028-01-17", "total": 367, "phases": [{"name": "3-1. HVAC Equipment Manufacturing", "start": "2025-10-03", "finish": "2027-01-20", "count": 51, "workdays": 2595, "contractors": ["Stulz", "JOSEM"]}, {"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-10-10", "count": 90, "workdays": 1539, "contractors": ["Soler", "TOP", "LJ", "KNS", "GEM Tech", "Jeremias", "Hwyun", "Synerge", "SICA"]}, {"name": "2-2. Construction (Ground Floor)", "start": "2026-05-10", "finish": "2027-04-05", "count": 76, "workdays": 2782, "contractors": ["VIgor", "Soler", "Top", "Hwyun", "Synerge", "SICA"]}, {"name": "4. CDR Readiness for Equipment Move in", "start": "2026-05-11", "finish": "2027-07-14", "count": 13, "workdays": 1389, "contractors": ["KNS"]}, {"name": "3-2. HVAC Equipment Setup", "start": "2026-05-15", "finish": "2026-09-23", "count": 22, "workdays": 138, "contractors": ["Synergy", "TOP", "JOSEM"]}, {"name": "2-1. Construction (Mezzanine)", "start": "2026-06-23", "finish": "2027-04-02", "count": 46, "workdays": 4118, "contractors": ["Top", "Synerge"]}, {"name": "3-3. HVAC Equipment install", "start": "2026-07-22", "finish": "2026-12-23", "count": 42, "workdays": 498, "contractors": ["Synergy", "JOSEM"]}, {"name": "6. Cold Commissioning", "start": "2027-04-03", "finish": "2027-07-17", "count": 9, "workdays": 749, "contractors": ["Synergy", "LJ"]}, {"name": "5. Hook up", "start": "2027-06-23", "finish": "2027-07-04", "count": 3, "workdays": 11, "contractors": []}, {"name": "7. HOT Commissioning", "start": "2027-07-04", "finish": "2027-08-20", "count": 9, "workdays": 244, "contractors": ["Synergy"]}, {"name": "8. Submission of completion documents", "start": "2027-08-20", "finish": "2027-09-19", "count": 4, "workdays": 120, "contractors": ["KNS", "KNS & Sub con"]}, {"name": "9. VOC environmental permit", "start": "2027-09-19", "finish": "2028-01-17", "count": 2, "workdays": 240, "contractors": ["PWC"]}], "cp": {"critical": [{"name": "9. VOC environmental permit", "start": "2027-09-19", "finish": "2028-01-17", "span": 120, "slack": 0}], "near_critical": []}}, "E": {"min_start": "2026-04-01", "max_finish": "2026-08-08", "total": 7, "phases": [{"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-08-08", "count": 7, "workdays": 337, "contractors": []}], "cp": {"critical": [{"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-08-08", "span": 129, "slack": 0}], "near_critical": []}}, "P": {"min_start": "2025-10-03", "max_finish": "2027-01-20", "total": 134, "phases": [{"name": "3-1. HVAC Equipment Manufacturing", "start": "2025-10-03", "finish": "2027-01-20", "count": 51, "workdays": 2595, "contractors": ["Stulz", "JOSEM"]}, {"name": "1. Design + Order + Delivery", "start": "2026-04-16", "finish": "2026-10-10", "count": 83, "workdays": 1202, "contractors": ["Soler", "TOP", "LJ", "KNS", "GEM Tech", "Jeremias", "Hwyun", "Synerge", "SICA"]}], "cp": {"critical": [{"name": "3-1. HVAC Equipment Manufacturing", "start": "2025-10-03", "finish": "2027-01-20", "span": 474, "slack": 0}], "near_critical": []}}, "C": {"min_start": "2026-05-10", "max_finish": "2028-01-17", "total": 226, "phases": [{"name": "2-2. Construction (Ground Floor)", "start": "2026-05-10", "finish": "2027-04-05", "count": 76, "workdays": 2782, "contractors": ["VIgor", "Soler", "Top", "Hwyun", "Synerge", "SICA"]}, {"name": "4. CDR Readiness for Equipment Move in", "start": "2026-05-11", "finish": "2027-07-14", "count": 13, "workdays": 1389, "contractors": ["KNS"]}, {"name": "3-2. HVAC Equipment Setup", "start": "2026-05-15", "finish": "2026-09-23", "count": 22, "workdays": 138, "contractors": ["Synergy", "TOP", "JOSEM"]}, {"name": "2-1. Construction (Mezzanine)", "start": "2026-06-23", "finish": "2027-04-02", "count": 46, "workdays": 4118, "contractors": ["Top", "Synerge"]}, {"name": "3-3. HVAC Equipment install", "start": "2026-07-22", "finish": "2026-12-23", "count": 42, "workdays": 498, "contractors": ["Synergy", "JOSEM"]}, {"name": "6. Cold Commissioning", "start": "2027-04-03", "finish": "2027-07-17", "count": 9, "workdays": 749, "contractors": ["Synergy", "LJ"]}, {"name": "5. Hook up", "start": "2027-06-23", "finish": "2027-07-04", "count": 3, "workdays": 11, "contractors": []}, {"name": "7. HOT Commissioning", "start": "2027-07-04", "finish": "2027-08-20", "count": 9, "workdays": 244, "contractors": ["Synergy"]}, {"name": "8. Submission of completion documents", "start": "2027-08-20", "finish": "2027-09-19", "count": 4, "workdays": 120, "contractors": ["KNS", "KNS & Sub con"]}, {"name": "9. VOC environmental permit", "start": "2027-09-19", "finish": "2028-01-17", "count": 2, "workdays": 240, "contractors": ["PWC"]}], "cp": {"critical": [{"name": "9. VOC environmental permit", "start": "2027-09-19", "finish": "2028-01-17", "span": 120, "slack": 0}], "near_critical": []}}}, "CP1(Mixing)|GF": {"zone": "CP1(Mixing)", "floor": "GF", "building": "CP1", "epc_counts": {"E": 5, "P": 178, "C": 284}, "ALL": {"min_start": "2025-09-04", "max_finish": "2027-12-18", "total": 467, "phases": [{"name": "3-1. HVAC Equipment Manufacturing", "start": "2025-09-04", "finish": "2026-09-22", "count": 95, "workdays": 4477, "contractors": ["Stulz", "JOSEM", "CAMPIL"]}, {"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-08-05", "count": 88, "workdays": 1281, "contractors": ["Soler", "TOP", "LJ", "KNS", "GEM Tech", "Jeremias", "Hwyun", "Synerge", "SICA"]}, {"name": "2-2. Construction (Ground Floor)", "start": "2026-04-01", "finish": "2027-01-20", "count": 76, "workdays": 2298, "contractors": ["VIgor", "Soler", "Top", "Hwyun", "Synerge", "SICA"]}, {"name": "4. CDR Readiness for Equipment Move in", "start": "2026-04-01", "finish": "2027-05-03", "count": 13, "workdays": 1773, "contractors": ["KNS"]}, {"name": "2-1. Construction (Mezzanine)", "start": "2026-06-04", "finish": "2027-03-14", "count": 46, "workdays": 2831, "contractors": ["Top", "Synerge"]}, {"name": "3-2. HVAC Equipment Setup", "start": "2026-07-03", "finish": "2026-09-26", "count": 40, "workdays": 154, "contractors": ["Synergy", "JOSEM"]}, {"name": "3-3. HVAC Equipment install", "start": "2026-07-05", "finish": "2027-02-08", "count": 82, "workdays": 891, "contractors": ["Synergy", "JOSEM"]}, {"name": "6. Cold Commissioning", "start": "2027-01-28", "finish": "2027-05-23", "count": 9, "workdays": 829, "contractors": ["Synergy", "LJ"]}, {"name": "5. Hook up", "start": "2027-02-08", "finish": "2027-06-03", "count": 3, "workdays": 116, "contractors": ["KNS"]}, {"name": "7. HOT Commissioning", "start": "2027-06-03", "finish": "2027-07-20", "count": 9, "workdays": 234, "contractors": ["Synergy", "LJ"]}, {"name": "8. Submission of completion documents", "start": "2027-07-21", "finish": "2027-08-20", "count": 4, "workdays": 120, "contractors": ["KNS", "KNS & Sub con"]}, {"name": "9. VOC environmental permit", "start": "2027-08-20", "finish": "2027-12-18", "count": 2, "workdays": 240, "contractors": ["PWC"]}], "cp": {"critical": [{"name": "9. VOC environmental permit", "start": "2027-08-20", "finish": "2027-12-18", "span": 120, "slack": 0}], "near_critical": []}}, "E": {"min_start": "2026-04-01", "max_finish": "2026-06-03", "total": 5, "phases": [{"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-06-03", "count": 5, "workdays": 181, "contractors": []}], "cp": {"critical": [{"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-06-03", "span": 63, "slack": 0}], "near_critical": []}}, "P": {"min_start": "2025-09-04", "max_finish": "2026-09-22", "total": 178, "phases": [{"name": "3-1. HVAC Equipment Manufacturing", "start": "2025-09-04", "finish": "2026-09-22", "count": 95, "workdays": 4477, "contractors": ["Stulz", "JOSEM", "CAMPIL"]}, {"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-08-05", "count": 83, "workdays": 1100, "contractors": ["Soler", "TOP", "LJ", "KNS", "GEM Tech", "Jeremias", "Hwyun", "Synerge", "SICA"]}], "cp": {"critical": [{"name": "3-1. HVAC Equipment Manufacturing", "start": "2025-09-04", "finish": "2026-09-22", "span": 383, "slack": 0}], "near_critical": []}}, "C": {"min_start": "2026-04-01", "max_finish": "2027-12-18", "total": 284, "phases": [{"name": "2-2. Construction (Ground Floor)", "start": "2026-04-01", "finish": "2027-01-20", "count": 76, "workdays": 2298, "contractors": ["VIgor", "Soler", "Top", "Hwyun", "Synerge", "SICA"]}, {"name": "4. CDR Readiness for Equipment Move in", "start": "2026-04-01", "finish": "2027-05-03", "count": 13, "workdays": 1773, "contractors": ["KNS"]}, {"name": "2-1. Construction (Mezzanine)", "start": "2026-06-04", "finish": "2027-03-14", "count": 46, "workdays": 2831, "contractors": ["Top", "Synerge"]}, {"name": "3-2. HVAC Equipment Setup", "start": "2026-07-03", "finish": "2026-09-26", "count": 40, "workdays": 154, "contractors": ["Synergy", "JOSEM"]}, {"name": "3-3. HVAC Equipment install", "start": "2026-07-05", "finish": "2027-02-08", "count": 82, "workdays": 891, "contractors": ["Synergy", "JOSEM"]}, {"name": "6. Cold Commissioning", "start": "2027-01-28", "finish": "2027-05-23", "count": 9, "workdays": 829, "contractors": ["Synergy", "LJ"]}, {"name": "5. Hook up", "start": "2027-02-08", "finish": "2027-06-03", "count": 3, "workdays": 116, "contractors": ["KNS"]}, {"name": "7. HOT Commissioning", "start": "2027-06-03", "finish": "2027-07-20", "count": 9, "workdays": 234, "contractors": ["Synergy", "LJ"]}, {"name": "8. Submission of completion documents", "start": "2027-07-21", "finish": "2027-08-20", "count": 4, "workdays": 120, "contractors": ["KNS", "KNS & Sub con"]}, {"name": "9. VOC environmental permit", "start": "2027-08-20", "finish": "2027-12-18", "count": 2, "workdays": 240, "contractors": ["PWC"]}], "cp": {"critical": [{"name": "9. VOC environmental permit", "start": "2027-08-20", "finish": "2027-12-18", "span": 120, "slack": 0}], "near_critical": []}}}, "CP1(Mixing) (1'st F)|FF": {"zone": "CP1(Mixing) (1'st F)", "floor": "FF", "building": "CP1", "epc_counts": {"E": 5, "P": 118, "C": 207}, "ALL": {"min_start": "2025-10-03", "max_finish": "2028-02-01", "total": 330, "phases": [{"name": "3-1. HVAC Equipment Manufacturing", "start": "2025-10-03", "finish": "2026-08-27", "count": 35, "workdays": 1653, "contractors": ["Stulz"]}, {"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-09-26", "count": 88, "workdays": 1499, "contractors": ["Soler", "TOP", "LJ", "KNS", "GEM Tech", "Jeremias", "Hwyun", "Synerge", "SICA"]}, {"name": "2-1. Construction", "start": "2026-04-25", "finish": "2027-04-14", "count": 122, "workdays": 5724, "contractors": ["VIgor", "Soler", "Top", "Hwyun", "Synerge", "SICA"]}, {"name": "4. CDR Readiness for Equipment Move in", "start": "2026-04-26", "finish": "2027-06-18", "count": 13, "workdays": 1826, "contractors": ["KNS"]}, {"name": "3-2. HVAC Equipment Setup", "start": "2026-09-27", "finish": "2026-10-07", "count": 15, "workdays": 26, "contractors": ["Synergy"]}, {"name": "3-3. HVAC Equipment install", "start": "2026-09-29", "finish": "2027-01-30", "count": 30, "workdays": 287, "contractors": ["Synergy"]}, {"name": "6. Cold Commissioning", "start": "2027-03-15", "finish": "2027-06-28", "count": 9, "workdays": 749, "contractors": []}, {"name": "5. Hook up", "start": "2027-03-26", "finish": "2027-07-19", "count": 3, "workdays": 116, "contractors": ["KNS"]}, {"name": "7. HOT Commissioning", "start": "2027-07-19", "finish": "2027-09-04", "count": 9, "workdays": 237, "contractors": []}, {"name": "8. Submission of completion documents", "start": "2027-09-04", "finish": "2028-02-01", "count": 4, "workdays": 240, "contractors": ["KNS", "KNS & Sub con"]}, {"name": "9. VOC environmental permit", "start": "2027-10-04", "finish": "2028-02-01", "count": 2, "workdays": 240, "contractors": ["PWC"]}], "cp": {"critical": [{"name": "8. Submission of completion documents", "start": "2027-09-04", "finish": "2028-02-01", "span": 150, "slack": 0}, {"name": "9. VOC environmental permit", "start": "2027-10-04", "finish": "2028-02-01", "span": 120, "slack": 0}], "near_critical": []}}, "E": {"min_start": "2026-04-01", "max_finish": "2026-07-25", "total": 5, "phases": [{"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-07-25", "count": 5, "workdays": 295, "contractors": []}], "cp": {"critical": [{"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-07-25", "span": 115, "slack": 0}], "near_critical": []}}, "P": {"min_start": "2025-10-03", "max_finish": "2026-09-26", "total": 118, "phases": [{"name": "3-1. HVAC Equipment Manufacturing", "start": "2025-10-03", "finish": "2026-08-27", "count": 35, "workdays": 1653, "contractors": ["Stulz"]}, {"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-09-26", "count": 83, "workdays": 1204, "contractors": ["Soler", "TOP", "LJ", "KNS", "GEM Tech", "Jeremias", "Hwyun", "Synerge", "SICA"]}], "cp": {"critical": [{"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-09-26", "span": 178, "slack": 0}], "near_critical": [{"name": "3-1. HVAC Equipment Manufacturing", "start": "2025-10-03", "finish": "2026-08-27", "span": 328, "slack": 30}]}}, "C": {"min_start": "2026-04-25", "max_finish": "2028-02-01", "total": 207, "phases": [{"name": "2-1. Construction", "start": "2026-04-25", "finish": "2027-04-14", "count": 122, "workdays": 5724, "contractors": ["VIgor", "Soler", "Top", "Hwyun", "Synerge", "SICA"]}, {"name": "4. CDR Readiness for Equipment Move in", "start": "2026-04-26", "finish": "2027-06-18", "count": 13, "workdays": 1826, "contractors": ["KNS"]}, {"name": "3-2. HVAC Equipment Setup", "start": "2026-09-27", "finish": "2026-10-07", "count": 15, "workdays": 26, "contractors": ["Synergy"]}, {"name": "3-3. HVAC Equipment install", "start": "2026-09-29", "finish": "2027-01-30", "count": 30, "workdays": 287, "contractors": ["Synergy"]}, {"name": "6. Cold Commissioning", "start": "2027-03-15", "finish": "2027-06-28", "count": 9, "workdays": 749, "contractors": []}, {"name": "5. Hook up", "start": "2027-03-26", "finish": "2027-07-19", "count": 3, "workdays": 116, "contractors": ["KNS"]}, {"name": "7. HOT Commissioning", "start": "2027-07-19", "finish": "2027-09-04", "count": 9, "workdays": 237, "contractors": []}, {"name": "8. Submission of completion documents", "start": "2027-09-04", "finish": "2028-02-01", "count": 4, "workdays": 240, "contractors": ["KNS", "KNS & Sub con"]}, {"name": "9. VOC environmental permit", "start": "2027-10-04", "finish": "2028-02-01", "count": 2, "workdays": 240, "contractors": ["PWC"]}], "cp": {"critical": [{"name": "8. Submission of completion documents", "start": "2027-09-04", "finish": "2028-02-01", "span": 150, "slack": 0}, {"name": "9. VOC environmental permit", "start": "2027-10-04", "finish": "2028-02-01", "span": 120, "slack": 0}], "near_critical": []}}}, "CP1(Notching&Staking)|GF": {"zone": "CP1(Notching&Staking)", "floor": "GF", "building": "CP1", "epc_counts": {"E": 7, "P": 146, "C": 210}, "ALL": {"min_start": "2025-11-21", "max_finish": "2027-10-24", "total": 363, "phases": [{"name": "3-1. HVAC Equipment Manufacturing", "start": "2025-11-21", "finish": "2027-02-01", "count": 63, "workdays": 3779, "contractors": ["CAMPIL", "JOSEM"]}, {"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2027-01-01", "count": 90, "workdays": 4292, "contractors": ["Soler", "TOP", "LJ", "KNS", "GEM Tech", "Jeremias", "Hwyun", "Synerge", "SICA"]}, {"name": "2-2. Construction (Ground Floor)", "start": "2026-05-10", "finish": "2027-02-03", "count": 76, "workdays": 2169, "contractors": ["Soler", "Top", "KNS", "Gem-tech", "Synerge", "SICA"]}, {"name": "2-1. Construction (Mezzanine)", "start": "2026-05-15", "finish": "2027-02-28", "count": 46, "workdays": 3074, "contractors": ["Top", "Synerge"]}, {"name": "4. CDR Readiness for Equipment Move in", "start": "2026-05-15", "finish": "2027-04-17", "count": 13, "workdays": 1164, "contractors": ["KNS"]}, {"name": "3-2. HVAC Equipment Setup", "start": "2026-07-12", "finish": "2026-11-25", "count": 28, "workdays": 178, "contractors": ["CAMPIL", "JOSEM", "TOP"]}, {"name": "3-3. HVAC Equipment install", "start": "2026-10-14", "finish": "2027-03-30", "count": 20, "workdays": 315, "contractors": ["JOSEM", "Synergy"]}, {"name": "6. Cold Commissioning", "start": "2027-02-02", "finish": "2027-04-16", "count": 9, "workdays": 148, "contractors": ["Synergy", "LJ"]}, {"name": "5. Hook up", "start": "2027-03-27", "finish": "2027-04-07", "count": 3, "workdays": 11, "contractors": ["KNS"]}, {"name": "7. HOT Commissioning", "start": "2027-04-16", "finish": "2027-05-27", "count": 9, "workdays": 212, "contractors": ["Synergy"]}, {"name": "8. Submission of completion documents", "start": "2027-05-27", "finish": "2027-10-24", "count": 4, "workdays": 240, "contractors": ["KNS", "KNS & Sub con"]}, {"name": "9. VOC environmental permit", "start": "2027-06-26", "finish": "2027-10-24", "count": 2, "workdays": 240, "contractors": ["PWC"]}], "cp": {"critical": [{"name": "8. Submission of completion documents", "start": "2027-05-27", "finish": "2027-10-24", "span": 150, "slack": 0}, {"name": "9. VOC environmental permit", "start": "2027-06-26", "finish": "2027-10-24", "span": 120, "slack": 0}], "near_critical": []}}, "E": {"min_start": "2026-04-01", "max_finish": "2026-08-03", "total": 7, "phases": [{"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-08-03", "count": 7, "workdays": 334, "contractors": []}], "cp": {"critical": [{"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-08-03", "span": 124, "slack": 0}], "near_critical": []}}, "P": {"min_start": "2025-11-21", "max_finish": "2027-02-01", "total": 146, "phases": [{"name": "3-1. HVAC Equipment Manufacturing", "start": "2025-11-21", "finish": "2027-02-01", "count": 63, "workdays": 3779, "contractors": ["CAMPIL", "JOSEM"]}, {"name": "1. Design + Order + Delivery", "start": "2026-04-16", "finish": "2027-01-01", "count": 83, "workdays": 3958, "contractors": ["Soler", "TOP", "LJ", "KNS", "GEM Tech", "Jeremias", "Hwyun", "Synerge", "SICA"]}], "cp": {"critical": [{"name": "3-1. HVAC Equipment Manufacturing", "start": "2025-11-21", "finish": "2027-02-01", "span": 437, "slack": 0}], "near_critical": []}}, "C": {"min_start": "2026-05-10", "max_finish": "2027-10-24", "total": 210, "phases": [{"name": "2-2. Construction (Ground Floor)", "start": "2026-05-10", "finish": "2027-02-03", "count": 76, "workdays": 2169, "contractors": ["Soler", "Top", "KNS", "Gem-tech", "Synerge", "SICA"]}, {"name": "2-1. Construction (Mezzanine)", "start": "2026-05-15", "finish": "2027-02-28", "count": 46, "workdays": 3074, "contractors": ["Top", "Synerge"]}, {"name": "4. CDR Readiness for Equipment Move in", "start": "2026-05-15", "finish": "2027-04-17", "count": 13, "workdays": 1164, "contractors": ["KNS"]}, {"name": "3-2. HVAC Equipment Setup", "start": "2026-07-12", "finish": "2026-11-25", "count": 28, "workdays": 178, "contractors": ["CAMPIL", "JOSEM", "TOP"]}, {"name": "3-3. HVAC Equipment install", "start": "2026-10-14", "finish": "2027-03-30", "count": 20, "workdays": 315, "contractors": ["JOSEM", "Synergy"]}, {"name": "6. Cold Commissioning", "start": "2027-02-02", "finish": "2027-04-16", "count": 9, "workdays": 148, "contractors": ["Synergy", "LJ"]}, {"name": "5. Hook up", "start": "2027-03-27", "finish": "2027-04-07", "count": 3, "workdays": 11, "contractors": ["KNS"]}, {"name": "7. HOT Commissioning", "start": "2027-04-16", "finish": "2027-05-27", "count": 9, "workdays": 212, "contractors": ["Synergy"]}, {"name": "8. Submission of completion documents", "start": "2027-05-27", "finish": "2027-10-24", "count": 4, "workdays": 240, "contractors": ["KNS", "KNS & Sub con"]}, {"name": "9. VOC environmental permit", "start": "2027-06-26", "finish": "2027-10-24", "count": 2, "workdays": 240, "contractors": ["PWC"]}], "cp": {"critical": [{"name": "8. Submission of completion documents", "start": "2027-05-27", "finish": "2027-10-24", "span": 150, "slack": 0}, {"name": "9. VOC environmental permit", "start": "2027-06-26", "finish": "2027-10-24", "span": 120, "slack": 0}], "near_critical": []}}}, "CP1(Slitting)|GF": {"zone": "CP1(Slitting)", "floor": "GF", "building": "CP1", "epc_counts": {"E": 5, "P": 126, "C": 200}, "ALL": {"min_start": "2025-09-04", "max_finish": "2027-08-10", "total": 331, "phases": [{"name": "3-1. HVAC Equipment Manufacturing", "start": "2025-09-04", "finish": "2027-02-04", "count": 43, "workdays": 2445, "contractors": ["Stulz", "JOSEM", "CAMPIL"]}, {"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2027-01-18", "count": 88, "workdays": 4327, "contractors": ["Soler", "TOP", "LJ", "KNS", "GEM Tech", "Jeremias", "Hwyun", "Synerge", "SICA"]}, {"name": "2-2. Construction (Ground Floor)", "start": "2026-04-25", "finish": "2027-01-09", "count": 76, "workdays": 2032, "contractors": ["Soler", "Top", "KNS", "Gem-tech", "Synerge", "SICA"]}, {"name": "2-1. Construction (Mezzanine)", "start": "2026-05-10", "finish": "2027-03-07", "count": 46, "workdays": 1907, "contractors": ["Top", "Synerge"]}, {"name": "4. CDR Readiness for Equipment Move in", "start": "2026-05-10", "finish": "2027-02-04", "count": 13, "workdays": 1108, "contractors": ["KNS"]}, {"name": "3-2. HVAC Equipment Setup", "start": "2026-06-15", "finish": "2026-10-10", "count": 16, "workdays": 138, "contractors": ["Synergy", "TOP"]}, {"name": "3-3. HVAC Equipment install", "start": "2026-08-12", "finish": "2027-01-09", "count": 22, "workdays": 420, "contractors": ["Synergy", "JOSEM"]}, {"name": "6. Cold Commissioning", "start": "2026-12-13", "finish": "2027-01-25", "count": 9, "workdays": 259, "contractors": ["Synergy", "LJ"]}, {"name": "5. Hook up", "start": "2027-01-14", "finish": "2027-01-25", "count": 3, "workdays": 11, "contractors": []}, {"name": "7. HOT Commissioning", "start": "2027-01-25", "finish": "2027-03-13", "count": 9, "workdays": 234, "contractors": ["Synergy"]}, {"name": "8. Submission of completion documents", "start": "2027-03-13", "finish": "2027-08-10", "count": 4, "workdays": 240, "contractors": ["KNS", "KNS & Sub con"]}, {"name": "9. VOC environmental permit", "start": "2027-04-12", "finish": "2027-08-10", "count": 2, "workdays": 240, "contractors": ["PWC"]}], "cp": {"critical": [{"name": "8. Submission of completion documents", "start": "2027-03-13", "finish": "2027-08-10", "span": 150, "slack": 0}, {"name": "9. VOC environmental permit", "start": "2027-04-12", "finish": "2027-08-10", "span": 120, "slack": 0}], "near_critical": []}}, "E": {"min_start": "2026-04-01", "max_finish": "2026-08-18", "total": 5, "phases": [{"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-08-18", "count": 5, "workdays": 345, "contractors": []}], "cp": {"critical": [{"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2026-08-18", "span": 139, "slack": 0}], "near_critical": []}}, "P": {"min_start": "2025-09-04", "max_finish": "2027-02-04", "total": 126, "phases": [{"name": "3-1. HVAC Equipment Manufacturing", "start": "2025-09-04", "finish": "2027-02-04", "count": 43, "workdays": 2445, "contractors": ["Stulz", "JOSEM", "CAMPIL"]}, {"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2027-01-18", "count": 83, "workdays": 3982, "contractors": ["Soler", "TOP", "LJ", "KNS", "GEM Tech", "Jeremias", "Hwyun", "Synerge", "SICA"]}], "cp": {"critical": [{"name": "3-1. HVAC Equipment Manufacturing", "start": "2025-09-04", "finish": "2027-02-04", "span": 518, "slack": 0}], "near_critical": [{"name": "1. Design + Order + Delivery", "start": "2026-04-01", "finish": "2027-01-18", "span": 292, "slack": 17}]}}, "C": {"min_start": "2026-04-25", "max_finish": "2027-08-10", "total": 200, "phases": [{"name": "2-2. Construction (Ground Floor)", "start": "2026-04-25", "finish": "2027-01-09", "count": 76, "workdays": 2032, "contractors": ["Soler", "Top", "KNS", "Gem-tech", "Synerge", "SICA"]}, {"name": "2-1. Construction (Mezzanine)", "start": "2026-05-10", "finish": "2027-03-07", "count": 46, "workdays": 1907, "contractors": ["Top", "Synerge"]}, {"name": "4. CDR Readiness for Equipment Move in", "start": "2026-05-10", "finish": "2027-02-04", "count": 13, "workdays": 1108, "contractors": ["KNS"]}, {"name": "3-2. HVAC Equipment Setup", "start": "2026-06-15", "finish": "2026-10-10", "count": 16, "workdays": 138, "contractors": ["Synergy", "TOP"]}, {"name": "3-3. HVAC Equipment install", "start": "2026-08-12", "finish": "2027-01-09", "count": 22, "workdays": 420, "contractors": ["Synergy", "JOSEM"]}, {"name": "6. Cold Commissioning", "start": "2026-12-13", "finish": "2027-01-25", "count": 9, "workdays": 259, "contractors": ["Synergy", "LJ"]}, {"name": "5. Hook up", "start": "2027-01-14", "finish": "2027-01-25", "count": 3, "workdays": 11, "contractors": []}, {"name": "7. HOT Commissioning", "start": "2027-01-25", "finish": "2027-03-13", "count": 9, "workdays": 234, "contractors": ["Synergy"]}, {"name": "8. Submission of completion documents", "start": "2027-03-13", "finish": "2027-08-10", "count": 4, "workdays": 240, "contractors": ["KNS", "KNS & Sub con"]}, {"name": "9. VOC environmental permit", "start": "2027-04-12", "finish": "2027-08-10", "count": 2, "workdays": 240, "contractors": ["PWC"]}], "cp": {"critical": [{"name": "8. Submission of completion documents", "start": "2027-03-13", "finish": "2027-08-10", "span": 150, "slack": 0}, {"name": "9. VOC environmental permit", "start": "2027-04-12", "finish": "2027-08-10", "span": 120, "slack": 0}], "near_critical": []}}}, "FA1 (M1)|FF": {"zone": "FA1 (M1)", "floor": "FF", "building": "FA1", "epc_counts": {"C": 101}, "ALL": {"min_start": "2025-08-30", "max_finish": "2027-04-23", "total": 101, "phases": [{"name": "4. CDR Readiness for Equipment Move in", "start": "2025-08-30", "finish": "2027-04-23", "count": 11, "workdays": 1761, "contractors": []}, {"name": "2-1. Construction (First Floor)", "start": "2026-01-13", "finish": "2027-02-21", "count": 90, "workdays": 3207, "contractors": ["GEMTECH", "SYNERGY", "SOLER", "KNS", "TOPENG", "SICA"]}], "cp": {"critical": [{"name": "4. CDR Readiness for Equipment Move in", "start": "2025-08-30", "finish": "2027-04-23", "span": 601, "slack": 0}], "near_critical": []}}, "E": null, "P": null, "C": {"min_start": "2025-08-30", "max_finish": "2027-04-23", "total": 101, "phases": [{"name": "4. CDR Readiness for Equipment Move in", "start": "2025-08-30", "finish": "2027-04-23", "count": 11, "workdays": 1761, "contractors": []}, {"name": "2-1. Construction (First Floor)", "start": "2026-01-13", "finish": "2027-02-21", "count": 90, "workdays": 3207, "contractors": ["GEMTECH", "SYNERGY", "SOLER", "KNS", "TOPENG", "SICA"]}], "cp": {"critical": [{"name": "4. CDR Readiness for Equipment Move in", "start": "2025-08-30", "finish": "2027-04-23", "span": 601, "slack": 0}], "near_critical": []}}}, "FA1 (M1)|GF": {"zone": "FA1 (M1)", "floor": "GF", "building": "FA1", "epc_counts": {"E": 5, "P": 123, "C": 148}, "ALL": {"min_start": "2025-03-15", "max_finish": "2027-10-11", "total": 276, "phases": [{"name": "1. Design + Order + Delivery", "start": "2025-03-15", "finish": "2026-11-21", "count": 85, "workdays": 2326, "contractors": ["KNS, GEMTECH", "SYNERGY", "SOLER", "KNS", "TOPENG", "SICA"]}, {"name": "3-1. HVAC Equipment Producting", "start": "2025-08-30", "finish": "2026-10-29", "count": 43, "workdays": 1341, "contractors": ["JOSEM", "STULZ", "CAMFIL"]}, {"name": "3-2. HVAC Equipment Setup", "start": "2025-11-01", "finish": "2026-11-06", "count": 14, "workdays": 397, "contractors": ["SYNERGY"]}, {"name": "3-3. HVAC Equipment install", "start": "2025-11-02", "finish": "2027-01-25", "count": 30, "workdays": 803, "contractors": ["JOSEM", "SYNERGY"]}, {"name": "4. CDR Readiness for Equipment Move in", "start": "2025-11-02", "finish": "2027-06-21", "count": 12, "workdays": 1750, "contractors": ["SYNERGY", "SOLER", "JOSEM, STULZ, CAMFIL", "KNS", "TOPENG"]}, {"name": "2-2. Construction (Ground Floor)", "start": "2026-05-04", "finish": "2027-04-21", "count": 66, "workdays": 2879, "contractors": ["GEMTECH", "SYNERGY", "SOLER", "KNS", "TOPENG", "SICA"]}, {"name": "11. Cold Commissioning", "start": "2027-04-29", "finish": "2027-06-06", "count": 9, "workdays": 124, "contractors": ["Synergy", "LJ"]}, {"name": "12. Submission of completion documents", "start": "2027-05-14", "finish": "2027-06-13", "count": 4, "workdays": 120, "contractors": ["KNS", "KNS & Sub con"]}, {"name": "5. Hook up", "start": "2027-05-15", "finish": "2027-06-21", "count": 3, "workdays": 5, "contractors": ["KNS"]}, {"name": "11. HOT Commissioning", "start": "2027-06-06", "finish": "2027-07-17", "count": 9, "workdays": 212, "contractors": ["Synergy", "LJ"]}, {"name": "13. VOC environmental permit", "start": "2027-06-13", "finish": "2027-10-11", "count": 1, "workdays": 120, "contractors": ["PWC"]}], "cp": {"critical": [{"name": "13. VOC environmental permit", "start": "2027-06-13", "finish": "2027-10-11", "span": 120, "slack": 0}], "near_critical": []}}, "E": {"min_start": "2025-12-12", "max_finish": "2026-10-17", "total": 5, "phases": [{"name": "1. Design + Order + Delivery", "start": "2025-12-12", "finish": "2026-10-17", "count": 5, "workdays": 561, "contractors": []}], "cp": {"critical": [{"name": "1. Design + Order + Delivery", "start": "2025-12-12", "finish": "2026-10-17", "span": 309, "slack": 0}], "near_critical": []}}, "P": {"min_start": "2025-03-15", "max_finish": "2026-11-21", "total": 123, "phases": [{"name": "1. Design + Order + Delivery", "start": "2025-03-15", "finish": "2026-11-21", "count": 80, "workdays": 1765, "contractors": ["KNS, GEMTECH", "SYNERGY", "SOLER", "KNS", "TOPENG", "SICA"]}, {"name": "3-1. HVAC Equipment Producting", "start": "2025-08-30", "finish": "2026-10-29", "count": 43, "workdays": 1341, "contractors": ["JOSEM", "STULZ", "CAMFIL"]}], "cp": {"critical": [{"name": "1. Design + Order + Delivery", "start": "2025-03-15", "finish": "2026-11-21", "span": 616, "slack": 0}], "near_critical": [{"name": "3-1. HVAC Equipment Producting", "start": "2025-08-30", "finish": "2026-10-29", "span": 425, "slack": 23}]}}, "C": {"min_start": "2025-11-01", "max_finish": "2027-10-11", "total": 148, "phases": [{"name": "3-2. HVAC Equipment Setup", "start": "2025-11-01", "finish": "2026-11-06", "count": 14, "workdays": 397, "contractors": ["SYNERGY"]}, {"name": "3-3. HVAC Equipment install", "start": "2025-11-02", "finish": "2027-01-25", "count": 30, "workdays": 803, "contractors": ["JOSEM", "SYNERGY"]}, {"name": "4. CDR Readiness for Equipment Move in", "start": "2025-11-02", "finish": "2027-06-21", "count": 12, "workdays": 1750, "contractors": ["SYNERGY", "SOLER", "JOSEM, STULZ, CAMFIL", "KNS", "TOPENG"]}, {"name": "2-2. Construction (Ground Floor)", "start": "2026-05-04", "finish": "2027-04-21", "count": 66, "workdays": 2879, "contractors": ["GEMTECH", "SYNERGY", "SOLER", "KNS", "TOPENG", "SICA"]}, {"name": "11. Cold Commissioning", "start": "2027-04-29", "finish": "2027-06-06", "count": 9, "workdays": 124, "contractors": ["Synergy", "LJ"]}, {"name": "12. Submission of completion documents", "start": "2027-05-14", "finish": "2027-06-13", "count": 4, "workdays": 120, "contractors": ["KNS", "KNS & Sub con"]}, {"name": "5. Hook up", "start": "2027-05-15", "finish": "2027-06-21", "count": 3, "workdays": 5, "contractors": ["KNS"]}, {"name": "11. HOT Commissioning", "start": "2027-06-06", "finish": "2027-07-17", "count": 9, "workdays": 212, "contractors": ["Synergy", "LJ"]}, {"name": "13. VOC environmental permit", "start": "2027-06-13", "finish": "2027-10-11", "count": 1, "workdays": 120, "contractors": ["PWC"]}], "cp": {"critical": [{"name": "13. VOC environmental permit", "start": "2027-06-13", "finish": "2027-10-11", "span": 120, "slack": 0}], "near_critical": []}}}, "FA1 (M2)|FF": {"zone": "FA1 (M2)", "floor": "FF", "building": "FA1", "epc_counts": {"C": 41}, "ALL": {"min_start": "2025-08-31", "max_finish": "2028-03-19", "total": 41, "phases": [{"name": "4. CDR Readiness for Equipment Move in", "start": "2025-08-31", "finish": "2027-10-21", "count": 15, "workdays": 2200, "contractors": ["GEMTECH", "SYNERGY", "SOLER", "JOSEM, STULZ, CAMFIL", "KNS", "TOPENG"]}, {"name": "11. Cold Commissioning", "start": "2027-06-27", "finish": "2027-11-13", "count": 9, "workdays": 225, "contractors": ["Synergy", "LJ"]}, {"name": "5. Hook up", "start": "2027-09-30", "finish": "2027-10-27", "count": 3, "workdays": 32, "contractors": ["KNS"]}, {"name": "12. Submission of completion documents", "start": "2027-10-21", "finish": "2027-11-20", "count": 4, "workdays": 120, "contractors": ["KNS", "KNS & Sub con"]}, {"name": "11. HOT Commissioning", "start": "2027-11-13", "finish": "2027-12-24", "count": 9, "workdays": 212, "contractors": ["Synergy", "LJ"]}, {"name": "13. VOC environmental permit", "start": "2027-11-20", "finish": "2028-03-19", "count": 1, "workdays": 120, "contractors": ["PWC"]}], "cp": {"critical": [{"name": "13. VOC environmental permit", "start": "2027-11-20", "finish": "2028-03-19", "span": 120, "slack": 0}], "near_critical": []}}, "E": null, "P": null, "C": {"min_start": "2025-08-31", "max_finish": "2028-03-19", "total": 41, "phases": [{"name": "4. CDR Readiness for Equipment Move in", "start": "2025-08-31", "finish": "2027-10-21", "count": 15, "workdays": 2200, "contractors": ["GEMTECH", "SYNERGY", "SOLER", "JOSEM, STULZ, CAMFIL", "KNS", "TOPENG"]}, {"name": "11. Cold Commissioning", "start": "2027-06-27", "finish": "2027-11-13", "count": 9, "workdays": 225, "contractors": ["Synergy", "LJ"]}, {"name": "5. Hook up", "start": "2027-09-30", "finish": "2027-10-27", "count": 3, "workdays": 32, "contractors": ["KNS"]}, {"name": "12. Submission of completion documents", "start": "2027-10-21", "finish": "2027-11-20", "count": 4, "workdays": 120, "contractors": ["KNS", "KNS & Sub con"]}, {"name": "11. HOT Commissioning", "start": "2027-11-13", "finish": "2027-12-24", "count": 9, "workdays": 212, "contractors": ["Synergy", "LJ"]}, {"name": "13. VOC environmental permit", "start": "2027-11-20", "finish": "2028-03-19", "count": 1, "workdays": 120, "contractors": ["PWC"]}], "cp": {"critical": [{"name": "13. VOC environmental permit", "start": "2027-11-20", "finish": "2028-03-19", "span": 120, "slack": 0}], "near_critical": []}}}, "FA1 (M2)|GF": {"zone": "FA1 (M2)", "floor": "GF", "building": "FA1", "epc_counts": {"E": 7, "P": 129, "C": 126}, "ALL": {"min_start": "2025-03-15", "max_finish": "2027-07-19", "total": 262, "phases": [{"name": "1. Design + Order + Delivery", "start": "2025-03-15", "finish": "2027-02-04", "count": 89, "workdays": 5033, "contractors": ["Soler", "TOP", "LJ", "KNS", "GEM Tech", "SYENRGY", "SICA"]}, {"name": "3-1. HVAC Equipment Producting", "start": "2025-08-31", "finish": "2026-10-04", "count": 47, "workdays": 4052, "contractors": ["JOSEM", "STULZ", "CAMFIL"]}, {"name": "3-2. HVAC Equipment Setup", "start": "2026-02-15", "finish": "2026-10-12", "count": 18, "workdays": 882, "contractors": ["SYNERGY"]}, {"name": "2. Construction (Ground Floor)", "start": "2026-04-01", "finish": "2027-06-19", "count": 70, "workdays": 5076, "contractors": ["GEMTECH", "SYNERGY", "SOLER", "KNS", "TOPENG", "SICA"]}, {"name": "3-3. HVAC Equipment install", "start": "2026-07-15", "finish": "2027-07-19", "count": 38, "workdays": 677, "contractors": ["JOSEM", "SYNERGY"]}], "cp": {"critical": [{"name": "3-3. HVAC Equipment install", "start": "2026-07-15", "finish": "2027-07-19", "span": 369, "slack": 0}], "near_critical": [{"name": "2. Construction (Ground Floor)", "start": "2026-04-01", "finish": "2027-06-19", "span": 444, "slack": 30}]}}, "E": {"min_start": "2025-11-19", "max_finish": "2026-10-02", "total": 7, "phases": [{"name": "1. Design + Order + Delivery", "start": "2025-11-19", "finish": "2026-10-02", "count": 7, "workdays": 512, "contractors": []}], "cp": {"critical": [{"name": "1. Design + Order + Delivery", "start": "2025-11-19", "finish": "2026-10-02", "span": 317, "slack": 0}], "near_critical": []}}, "P": {"min_start": "2025-03-15", "max_finish": "2027-02-04", "total": 129, "phases": [{"name": "1. Design + Order + Delivery", "start": "2025-03-15", "finish": "2027-02-04", "count": 82, "workdays": 4521, "contractors": ["Soler", "TOP", "LJ", "KNS", "GEM Tech", "SYENRGY", "SICA"]}, {"name": "3-1. HVAC Equipment Producting", "start": "2025-08-31", "finish": "2026-10-04", "count": 47, "workdays": 4052, "contractors": ["JOSEM", "STULZ", "CAMFIL"]}], "cp": {"critical": [{"name": "1. Design + Order + Delivery", "start": "2025-03-15", "finish": "2027-02-04", "span": 691, "slack": 0}], "near_critical": []}}, "C": {"min_start": "2026-02-15", "max_finish": "2027-07-19", "total": 126, "phases": [{"name": "3-2. HVAC Equipment Setup", "start": "2026-02-15", "finish": "2026-10-12", "count": 18, "workdays": 882, "contractors": ["SYNERGY"]}, {"name": "2. Construction (Ground Floor)", "start": "2026-04-01", "finish": "2027-06-19", "count": 70, "workdays": 5076, "contractors": ["GEMTECH", "SYNERGY", "SOLER", "KNS", "TOPENG", "SICA"]}, {"name": "3-3. HVAC Equipment install", "start": "2026-07-15", "finish": "2027-07-19", "count": 38, "workdays": 677, "contractors": ["JOSEM", "SYNERGY"]}], "cp": {"critical": [{"name": "3-3. HVAC Equipment install", "start": "2026-07-15", "finish": "2027-07-19", "span": 369, "slack": 0}], "near_critical": [{"name": "2. Construction (Ground Floor)", "start": "2026-04-01", "finish": "2027-06-19", "span": 444, "slack": 30}]}}}, "FA1 (M3)|FF": {"zone": "FA1 (M3)", "floor": "FF", "building": "FA1", "epc_counts": {"C": 95}, "ALL": {"min_start": "2025-08-30", "max_finish": "2027-09-18", "total": 95, "phases": [{"name": "4. CDR Readiness for Equipment Move in", "start": "2025-08-30", "finish": "2027-09-18", "count": 11, "workdays": 2540, "contractors": []}, {"name": "2-1. Construction (First Floor)", "start": "2026-03-13", "finish": "2027-09-03", "count": 84, "workdays": 5113, "contractors": ["GEMTECH", "SOLER", "KNS", "SYENRGY", "TOPENG", "SICA"]}], "cp": {"critical": [{"name": "4. CDR Readiness for Equipment Move in", "start": "2025-08-30", "finish": "2027-09-18", "span": 749, "slack": 0}], "near_critical": [{"name": "2-1. Construction (First Floor)", "start": "2026-03-13", "finish": "2027-09-03", "span": 539, "slack": 15}]}}, "E": null, "P": null, "C": {"min_start": "2025-08-30", "max_finish": "2027-09-18", "total": 95, "phases": [{"name": "4. CDR Readiness for Equipment Move in", "start": "2025-08-30", "finish": "2027-09-18", "count": 11, "workdays": 2540, "contractors": []}, {"name": "2-1. Construction (First Floor)", "start": "2026-03-13", "finish": "2027-09-03", "count": 84, "workdays": 5113, "contractors": ["GEMTECH", "SOLER", "KNS", "SYENRGY", "TOPENG", "SICA"]}], "cp": {"critical": [{"name": "4. CDR Readiness for Equipment Move in", "start": "2025-08-30", "finish": "2027-09-18", "span": 749, "slack": 0}], "near_critical": [{"name": "2-1. Construction (First Floor)", "start": "2026-03-13", "finish": "2027-09-03", "span": 539, "slack": 15}]}}}, "FA1 (M3)|GF": {"zone": "FA1 (M3)", "floor": "GF", "building": "FA1", "epc_counts": {"E": 7, "P": 132, "C": 164}, "ALL": {"min_start": "2025-03-15", "max_finish": "2028-03-07", "total": 303, "phases": [{"name": "1. Design + Order + Delivery", "start": "2025-03-15", "finish": "2027-03-08", "count": 88, "workdays": 5064, "contractors": ["GEMTECH", "SUB-CON", "SYNERGY", "Soler", "TOP", "WSP", "LJ", "KNS", "SICA"]}, {"name": "3-1. HVAC Equipment Producting", "start": "2025-08-30", "finish": "2026-10-29", "count": 51, "workdays": 4385, "contractors": ["JOSEM", "STULZ", "CAMFIL"]}, {"name": "2-2. Construction (Ground Floor)", "start": "2026-02-22", "finish": "2027-07-23", "count": 76, "workdays": 4883, "contractors": ["GEMTECH", "SOLER", "KNS", "SYENRGY", "TOPENG", "SICA"]}, {"name": "4. CDR Readiness for Equipment Move in", "start": "2026-02-22", "finish": "2027-10-09", "count": 13, "workdays": 2549, "contractors": ["KNS"]}, {"name": "3-2. HVAC Equipment Setup", "start": "2026-07-27", "finish": "2026-11-17", "count": 19, "workdays": 175, "contractors": ["SYENRGY"]}, {"name": "3-3. HVAC Equipment install", "start": "2026-07-30", "finish": "2027-10-03", "count": 30, "workdays": 587, "contractors": ["JOSEM", "SYENRGY"]}, {"name": "11. Cold Commissioning", "start": "2027-07-03", "finish": "2027-11-01", "count": 9, "workdays": 207, "contractors": ["SYENRGY", "LJ"]}, {"name": "5. Hook up", "start": "2027-08-25", "finish": "2027-10-15", "count": 3, "workdays": 56, "contractors": []}, {"name": "12. Submission of completion documents", "start": "2027-10-09", "finish": "2027-11-08", "count": 4, "workdays": 120, "contractors": ["KNS", "KNS & Sub con"]}, {"name": "11. HOT Commissioning", "start": "2027-11-01", "finish": "2027-12-12", "count": 9, "workdays": 212, "contractors": ["SYENRGY", "LJ"]}, {"name": "13. VOC environmental permit", "start": "2027-11-08", "finish": "2028-03-07", "count": 1, "workdays": 120, "contractors": ["PWC"]}], "cp": {"critical": [{"name": "13. VOC environmental permit", "start": "2027-11-08", "finish": "2028-03-07", "span": 120, "slack": 0}], "near_critical": []}}, "E": {"min_start": "2026-02-01", "max_finish": "2026-11-01", "total": 7, "phases": [{"name": "1. Design + Order + Delivery", "start": "2026-02-01", "finish": "2026-11-01", "count": 7, "workdays": 498, "contractors": ["KNS", "SUB-CON", "WSP"]}], "cp": {"critical": [{"name": "1. Design + Order + Delivery", "start": "2026-02-01", "finish": "2026-11-01", "span": 273, "slack": 0}], "near_critical": []}}, "P": {"min_start": "2025-03-15", "max_finish": "2027-03-08", "total": 132, "phases": [{"name": "1. Design + Order + Delivery", "start": "2025-03-15", "finish": "2027-03-08", "count": 81, "workdays": 4566, "contractors": ["GEMTECH", "SYNERGY", "Soler", "TOP", "LJ", "KNS", "SICA"]}, {"name": "3-1. HVAC Equipment Producting", "start": "2025-08-30", "finish": "2026-10-29", "count": 51, "workdays": 4385, "contractors": ["JOSEM", "STULZ", "CAMFIL"]}], "cp": {"critical": [{"name": "1. Design + Order + Delivery", "start": "2025-03-15", "finish": "2027-03-08", "span": 723, "slack": 0}], "near_critical": []}}, "C": {"min_start": "2026-02-22", "max_finish": "2028-03-07", "total": 164, "phases": [{"name": "2-2. Construction (Ground Floor)", "start": "2026-02-22", "finish": "2027-07-23", "count": 76, "workdays": 4883, "contractors": ["GEMTECH", "SOLER", "KNS", "SYENRGY", "TOPENG", "SICA"]}, {"name": "4. CDR Readiness for Equipment Move in", "start": "2026-02-22", "finish": "2027-10-09", "count": 13, "workdays": 2549, "contractors": ["KNS"]}, {"name": "3-2. HVAC Equipment Setup", "start": "2026-07-27", "finish": "2026-11-17", "count": 19, "workdays": 175, "contractors": ["SYENRGY"]}, {"name": "3-3. HVAC Equipment install", "start": "2026-07-30", "finish": "2027-10-03", "count": 30, "workdays": 587, "contractors": ["JOSEM", "SYENRGY"]}, {"name": "11. Cold Commissioning", "start": "2027-07-03", "finish": "2027-11-01", "count": 9, "workdays": 207, "contractors": ["SYENRGY", "LJ"]}, {"name": "5. Hook up", "start": "2027-08-25", "finish": "2027-10-15", "count": 3, "workdays": 56, "contractors": []}, {"name": "12. Submission of completion documents", "start": "2027-10-09", "finish": "2027-11-08", "count": 4, "workdays": 120, "contractors": ["KNS", "KNS & Sub con"]}, {"name": "11. HOT Commissioning", "start": "2027-11-01", "finish": "2027-12-12", "count": 9, "workdays": 212, "contractors": ["SYENRGY", "LJ"]}, {"name": "13. VOC environmental permit", "start": "2027-11-08", "finish": "2028-03-07", "count": 1, "workdays": 120, "contractors": ["PWC"]}], "cp": {"critical": [{"name": "13. VOC environmental permit", "start": "2027-11-08", "finish": "2028-03-07", "span": 120, "slack": 0}], "near_critical": []}}}}};
+const MILESTONES = {"FA1 (M1)|FF": [{"activity": "CDR Readiness for Equipment Move in (First Floor)", "start": "2027-02-26", "finish": "2027-04-23", "floor_label": "FF"}], "FA1 (M1)|GF": [{"activity": "CDR Readiness for Equipment Move in (Ground Floor)", "start": "2027-04-26", "finish": "2027-06-21", "floor_label": "GF"}], "FA1 (M2)|FF": [{"activity": "CDR Readiness for Equipment Move in (First Floor)", "start": "2027-06-24", "finish": "2027-09-30", "floor_label": "FF"}], "FA1 (M3)|FF": [{"activity": "CDR Readiness for Equipment Move in (First Floor)", "start": "2027-07-24", "finish": "2027-09-18", "floor_label": "FF"}], "FA1 (M3)|GF": [{"activity": "CDR Readiness for Equipment Move in (Ground Floor)", "start": "2027-06-30", "finish": "2027-08-25", "floor_label": "GF"}], "CP1(Mixing)|GF": [{"activity": "CDR Readiness for Equipment Move in", "start": "2027-01-25", "finish": "2027-05-03", "floor_label": ""}], "CP1(Mixing) (1'st F)|FF": [{"activity": "CDR Readiness for Equipment Move in", "start": "2027-03-12", "finish": "2027-06-18", "floor_label": ""}], "CP1(Coating)|GF": [{"activity": "CDR Readiness for Equipment Move in", "start": "2027-03-31", "finish": "2027-06-23", "floor_label": ""}], "CP1(Calendering)|GF": [{"activity": "CDR Readiness for Equipment Move in", "start": "2026-11-06", "finish": "2026-12-11", "floor_label": ""}], "CP1(Slitting)|GF": [{"activity": "CDR Readiness for Equipment Move in", "start": "2026-12-10", "finish": "2027-01-14", "floor_label": ""}], "CP1(Notching&Staking)|GF": [{"activity": "CDR Readiness for Equipment Move in", "start": "2027-01-30", "finish": "2027-03-27", "floor_label": ""}], "CP1(Assembly)|GF": [{"activity": "CDR Readiness for Equipment Move in", "start": "2027-02-14", "finish": "2027-04-04", "floor_label": ""}]};
+let currentZone=null,currentEPC='ALL';
+const EPC_COLORS={'E':'#6366f1','P':'#d97706','C':'#059669'};
+const PHASE_COLORS={
+  'Design':'#818cf8','Order':'#8b5cf6','Delivery':'#a78bfa','Design + Order':'#818cf8',
+  'Construction':'#3b82f6','Ground Floor':'#2563eb','First Floor':'#60a5fa','Mezzanine':'#38bdf8',
+  'HVAC Equipment':'#06b6d4','Manufacturing':'#0891b2','Producting':'#0891b2',
+  'Setup':'#0d9488','install':'#14b8a6',
+  'CDR':'#f59e0b','Hook up':'#f97316',
+  'Cold Commissioning':'#22d3ee','HOT Commissioning':'#ef4444',
+  'Submission':'#a3e635','VOC':'#84cc16','Ceiling':'#8b5cf6','default':'#64748b'
+};
+function gpc(n){for(let k in PHASE_COLORS)if(n.includes(k))return PHASE_COLORS[k];return PHASE_COLORS.default}
+function db(a,b){return Math.round((new Date(b)-new Date(a))/864e5)}
+function fmt(d){const p=d.split('-');return p[0].slice(2)+'.'+p[1]+'.'+p[2]}
+const STATUS_DATE='2026-04-20';
+
+function buildSidebar(){
+  const fa=document.getElementById('fa1-zones'),cp=document.getElementById('cp1-zones');
+  Object.keys(DATA.zones).sort().forEach(key=>{
+    const z=DATA.zones[key];const btn=document.createElement('div');
+    btn.className='zone-btn';btn.id='btn-'+key.replace(/[^a-zA-Z0-9]/g,'_');
+    btn.onclick=()=>{currentZone=key;showZone()};
+    const ft=z.floor==='FF'?'<span class="floor-tag floor-ff">FF</span>':'<span class="floor-tag floor-gf">GF</span>';
+    // Show milestone indicator
+    const hasMS=MILESTONES[key]&&MILESTONES[key].length>0;
+    const msIcon=hasMS?'<span style="color:#ef4444;font-size:10px">&#9670;</span>':'';
+    btn.innerHTML=msIcon+' '+z.zone.replace('CP1(','CP1 ').replace(')','')+' '+ft;
+    if(z.building==='FA1')fa.appendChild(btn);else cp.appendChild(btn);
+  });
+}
+function setActive(id){document.querySelectorAll('.zone-btn').forEach(b=>b.classList.remove('active'));const el=document.getElementById(id);if(el)el.classList.add('active')}
+
+function renderGantt(phases,cp,tStart,tEnd,zoneKey){
+  if(!phases||!phases.length)return '<div style="padding:20px;color:#64748b;font-size:12px">No activities in this EPC phase.</div>';
+  const totalD=db(tStart,tEnd);if(totalD<=0)return '';
+  let months=[];let d=new Date(tStart);d.setDate(1);
+  while(d<=new Date(tEnd)){months.push(d.toISOString().slice(0,7));d.setMonth(d.getMonth()+1)}
+  const critN=new Set((cp.critical||[]).map(c=>c.name));
+  const ncN=new Set((cp.near_critical||[]).map(c=>c.name));
+  
+  // Milestone lines data
+  const msData=zoneKey&&MILESTONES[zoneKey]?MILESTONES[zoneKey]:[];
+  
+  let h='<div class="gantt-container"><div class="gantt-header">';
+  h+='<div class="gantt-label-col">Phase / Discipline</div>';
+  h+='<div class="gantt-timeline" style="position:relative">';
+  months.forEach(m=>{h+='<div class="gantt-month">'+m.slice(2)+'</div>'});
+  // Milestone markers in header
+  msData.forEach(ms=>{
+    const msPos=(db(tStart,ms.start)/totalD)*100;
+    if(msPos>=0&&msPos<=100){
+      h+='<div style="position:absolute;left:'+msPos+'%;top:0;bottom:0;width:3px;background:#ef4444;z-index:3;opacity:.6"></div>';
+    }
+  });
+  h+='</div></div>';
+  
+  phases.forEach(p=>{
+    const isCrit=critN.has(p.name),isNC=ncN.has(p.name);
+    const rc=isCrit?'gantt-row critical-row':(isNC?'gantt-row near-critical-row':'gantt-row');
+    h+='<div class="'+rc+'"><div class="gantt-name">';
+    if(isCrit)h+='<span class="cp-badge cp">CP</span>';
+    else if(isNC)h+='<span class="cp-badge nc">NC</span>';
+    h+='<span title="'+p.name+'">'+p.name.slice(0,40)+'</span></div>';
+    h+='<div class="gantt-bars" style="position:relative">';
+    
+    // Milestone vertical lines
+    msData.forEach(ms=>{
+      const msStartPos=(db(tStart,ms.start)/totalD)*100;
+      const msFinPos=(db(tStart,ms.finish)/totalD)*100;
+      if(msStartPos>=0&&msStartPos<=100){
+        h+='<div class="ms-line" style="left:'+msStartPos+'%" data-label="Eq.Move-in"></div>';
+      }
+    });
+    
+    const left=Math.max(0,(db(tStart,p.start)/totalD)*100);
+    const w=Math.max(.5,(db(p.start,p.finish)/totalD)*100);
+    const col=gpc(p.name);const span=db(p.start,p.finish);
+    h+='<div class="bar" style="left:'+left+'%;width:'+w+'%;background:'+col+'">';
+    h+='<div class="bar-tooltip"><strong>'+p.name+'</strong><br>Start: '+fmt(p.start)+'<br>Finish: '+fmt(p.finish)+'<br>Duration: '+span+'d<br>Acts: '+p.count;
+    if(p.workdays)h+='<br>Work Days: '+p.workdays;
+    if(p.contractors&&p.contractors.length)h+='<br>Contractors: '+p.contractors.join(', ');
+    h+='</div></div></div></div>';
+  });
+  h+='</div>';return h;
+}
+
+function renderMSBanner(zoneKey){
+  const msData=MILESTONES[zoneKey];
+  if(!msData||!msData.length)return '';
+  const ms=msData[0];
+  const daysToStart=db(STATUS_DATE,ms.start);
+  const daysToFinish=db(STATUS_DATE,ms.finish);
+  const urgClass=daysToStart<180?'urgent':(daysToStart<365?'warning':'ok');
+  
+  let h='<div class="ms-banner">';
+  h+='<div><span class="ms-icon">&#9670;</span><span class="ms-title">CONTRACTUAL MILESTONE &mdash; Equipment Move-in</span></div>';
+  h+='<div class="ms-dates">';
+  h+='<div class="ms-date-item"><div class="ms-label">CDR Start</div><div class="ms-val">'+fmt(ms.start)+'</div><div class="ms-sub">D-'+daysToStart+' from today</div></div>';
+  h+='<div class="ms-date-item"><div class="ms-label">CDR Complete</div><div class="ms-val">'+fmt(ms.finish)+'</div><div class="ms-sub">D-'+daysToFinish+' from today</div></div>';
+  h+='<div class="ms-date-item"><div class="ms-label">CDR Duration</div><div class="ms-val">'+db(ms.start,ms.finish)+'d</div><div class="ms-sub">calendar days</div></div>';
+  h+='<div class="ms-date-item" style="border-color:'+(urgClass==='urgent'?'#ef4444':(urgClass==='warning'?'#f59e0b':'#22c55e'))+'"><div class="ms-label">Remaining</div><div class="ms-val" style="color:'+(urgClass==='urgent'?'#ef4444':(urgClass==='warning'?'#fbbf24':'#4ade80'))+'">'+daysToStart+'</div><div class="ms-sub">days to CDR start</div></div>';
+  h+='</div></div>';
+  return h;
+}
+
+function renderEPCTabs(z){
+  const ec=z.epc_counts;const total=(ec.E||0)+(ec.P||0)+(ec.C||0);
+  let h='<div class="epc-tabs">';
+  [{id:'ALL',l:'ALL',c:total,cls:'active-all'},{id:'E',l:'Engineering',c:ec.E||0,cls:'active-e'},{id:'P',l:'Procurement',c:ec.P||0,cls:'active-p'},{id:'C',l:'Construction',c:ec.C||0,cls:'active-c'}].forEach(t=>{
+    const a=currentEPC===t.id?(' '+t.cls):'';
+    h+='<div class="epc-tab'+a+'" onclick="currentEPC=\''+t.id+'\';showZone()"><span class="count">'+t.c+'</span><span class="label">'+t.l+'</span></div>';
+  });
+  h+='</div>';return h;
+}
+
+function showZone(){
+  if(!currentZone)return;
+  setActive('btn-'+currentZone.replace(/[^a-zA-Z0-9]/g,'_'));
+  const z=DATA.zones[currentZone];const d=z[currentEPC];
+  let h=renderEPCTabs(z);
+  
+  // Milestone Banner
+  h+=renderMSBanner(currentZone);
+  
+  if(!d){h+='<div style="padding:40px;text-align:center;color:#64748b">No activities in <strong style="color:#e2e8f0">'+currentEPC+'</strong> phase.</div>';document.getElementById('main-content').innerHTML=h;return}
+  const span=db(d.min_start,d.max_finish);
+  const epcL={ALL:'All Phases',E:'Engineering',P:'Procurement',C:'Construction'}[currentEPC];
+  const epcC={ALL:'#3b82f6',E:'#6366f1',P:'#d97706',C:'#059669'}[currentEPC];
+
+  h+='<div class="summary-cards">';
+  h+='<div class="card" style="border-left:3px solid '+epcC+'"><div class="label">'+epcL+'</div><div class="value">'+d.total+'</div><div class="sub">'+z.zone+' ('+z.floor+')</div></div>';
+  h+='<div class="card"><div class="label">Period</div><div class="value">'+fmt(d.min_start)+'</div><div class="sub">~ '+fmt(d.max_finish)+' ('+span+'d)</div></div>';
+  h+='<div class="card"><div class="label">Phases</div><div class="value">'+d.phases.length+'</div><div class="sub">discipline groups</div></div>';
+  h+='<div class="card critical"><div class="label">Critical</div><div class="value">'+d.cp.critical.length+'</div><div class="sub">'+d.cp.near_critical.length+' near-critical</div></div>';
+  h+='</div>';
+
+  if(currentEPC==='ALL'){
+    const ec=z.epc_counts;const tot=(ec.E||0)+(ec.P||0)+(ec.C||0);
+    h+='<div style="margin-bottom:14px;padding:10px 14px;background:#1e293b;border:1px solid #334155;border-radius:6px">';
+    h+='<div style="font-size:11px;color:#94a3b8;margin-bottom:6px">EPC Distribution</div>';
+    h+='<div class="epc-bar" style="height:14px"><div class="seg-e" style="width:'+((ec.E||0)/tot*100)+'%"></div><div class="seg-p" style="width:'+((ec.P||0)/tot*100)+'%"></div><div class="seg-c" style="width:'+((ec.C||0)/tot*100)+'%"></div></div>';
+    h+='<div style="display:flex;gap:16px;margin-top:6px;font-size:10px"><span style="color:#a5b4fc"><span class="epc-mini" style="background:#6366f1"></span>E:'+(ec.E||0)+'</span><span style="color:#fcd34d"><span class="epc-mini" style="background:#d97706"></span>P:'+(ec.P||0)+'</span><span style="color:#6ee7b7"><span class="epc-mini" style="background:#059669"></span>C:'+(ec.C||0)+'</span></div></div>';
+  }
+
+  if(d.cp.critical.length||d.cp.near_critical.length){
+    h+='<div class="cp-summary"><h3>&#9888; Critical Path ('+epcL+')</h3>';
+    h+='<table class="cp-table"><tr><th>Phase</th><th>Start</th><th>Finish</th><th>Duration</th><th>Slack</th><th>Status</th></tr>';
+    d.cp.critical.forEach(c=>{h+='<tr class="critical"><td>'+c.name+'</td><td>'+fmt(c.start)+'</td><td>'+fmt(c.finish)+'</td><td>'+c.span+'d</td><td><strong>'+c.slack+'d</strong></td><td class="risk-high">CRITICAL</td></tr>'});
+    d.cp.near_critical.forEach(c=>{h+='<tr class="near-critical"><td>'+c.name+'</td><td>'+fmt(c.start)+'</td><td>'+fmt(c.finish)+'</td><td>'+c.span+'d</td><td><strong>'+c.slack+'d</strong></td><td class="risk-med">NEAR-CRIT</td></tr>'});
+    h+='</table></div>';
+  }
+
+  // Legend with milestone
+  h+='<div class="legend">';
+  h+='<div class="legend-item"><div class="legend-color" style="background:#ef4444;transform:rotate(45deg);width:10px;height:10px"></div><strong style="color:#fca5a5">Equipment Move-in</strong></div>';
+  h+='<div class="legend-item"><div class="legend-color" style="background:#dc2626"></div>Critical Path</div>';
+  h+='<div class="legend-item"><div class="legend-color" style="background:#d97706"></div>Near-Critical</div>';
+  h+='</div>';
+
+  h+='<div class="section-title">'+epcL+' Schedule &mdash; Gantt Chart <span style="color:#fca5a5;font-size:11px">(&#9670; = Equipment Move-in)</span></div>';
+  h+=renderGantt(d.phases,d.cp,d.min_start,d.max_finish,currentZone);
+  document.getElementById('main-content').innerHTML=h;
+}
+
+function showMilestoneTimeline(){
+  setActive('btn-ms-timeline');currentZone=null;
+  let h='<div class="section-title" style="color:#fca5a5">&#9670; Equipment Move-in Milestone Timeline (All Zones)</div>';
+  
+  // Sort milestones by date
+  const allMS=[];
+  Object.keys(MILESTONES).sort().forEach(key=>{
+    const z=DATA.zones[key];if(!z)return;
+    MILESTONES[key].forEach(ms=>{
+      allMS.push({key,zone:z.zone,floor:z.floor,building:z.building,...ms});
+    });
+  });
+  allMS.sort((a,b)=>a.start.localeCompare(b.start));
+  
+  h+='<table class="ms-summary-table"><tr><th>#</th><th>Building</th><th>Zone</th><th>Floor</th><th>CDR Start &#9670;</th><th>CDR Complete</th><th>Duration</th><th>D-day</th><th>Status</th></tr>';
+  allMS.forEach((ms,i)=>{
+    const daysLeft=db(STATUS_DATE,ms.start);
+    const dur=db(ms.start,ms.finish);
+    const urgClass=daysLeft<180?'urgent':(daysLeft<365?'warning':'ok');
+    const status=daysLeft<180?'URGENT':(daysLeft<365?'WATCH':'ON TRACK');
+    h+='<tr style="cursor:pointer" onclick="currentZone=\''+ms.key+'\';currentEPC=\'ALL\';showZone()">';
+    h+='<td>'+(i+1)+'</td><td>'+ms.building+'</td><td>'+ms.zone+'</td>';
+    h+='<td><span class="floor-tag '+(ms.floor==='FF'?'floor-ff':'floor-gf')+'">'+ms.floor+'</span></td>';
+    h+='<td class="ms-date">'+fmt(ms.start)+'</td><td>'+fmt(ms.finish)+'</td>';
+    h+='<td>'+dur+'d</td>';
+    h+='<td class="days-left '+urgClass+'">D-'+daysLeft+'</td>';
+    h+='<td class="days-left '+urgClass+'">'+status+'</td></tr>';
+  });
+  h+='</table>';
+  
+  // Visual timeline
+  h+='<div class="section-title">Milestone Gantt</div>';
+  const msPhases=allMS.map(ms=>({name:ms.zone+' ('+ms.floor+') — Eq.Move-in',start:ms.start,finish:ms.finish,count:1,workdays:0,contractors:[]}));
+  const minS=allMS.reduce((a,b)=>a.start<b.start?a:b).start;
+  const maxF=allMS.reduce((a,b)=>a.finish>b.finish?a:b).finish;
+  
+  // Use CDR color for all bars
+  const totalD=db(minS,maxF);
+  let months=[];let d=new Date(minS);d.setDate(1);
+  while(d<=new Date(maxF)){months.push(d.toISOString().slice(0,7));d.setMonth(d.getMonth()+1)}
+  
+  h+='<div class="gantt-container"><div class="gantt-header"><div class="gantt-label-col">Zone — Equipment Move-in</div><div class="gantt-timeline">';
+  months.forEach(m=>{h+='<div class="gantt-month">'+m.slice(2)+'</div>'});
+  // Today line
+  const todayPos=(db(minS,STATUS_DATE)/totalD)*100;
+  h+='<div style="position:absolute;left:'+todayPos+'%;top:0;bottom:0;width:2px;background:#3b82f6;z-index:3"></div>';
+  h+='</div></div>';
+  
+  allMS.forEach((ms,i)=>{
+    const left=Math.max(0,(db(minS,ms.start)/totalD)*100);
+    const w=Math.max(1,(db(ms.start,ms.finish)/totalD)*100);
+    const daysLeft=db(STATUS_DATE,ms.start);
+    const color=daysLeft<180?'#ef4444':(daysLeft<365?'#f59e0b':'#22c55e');
+    
+    h+='<div class="gantt-row" style="cursor:pointer" onclick="currentZone=\''+ms.key+'\';currentEPC=\'ALL\';showZone()">';
+    h+='<div class="gantt-name"><span style="color:'+color+';font-size:14px">&#9670;</span> '+ms.zone+' ('+ms.floor+')</div>';
+    h+='<div class="gantt-bars">';
+    // Diamond at start
+    h+='<div style="position:absolute;left:'+left+'%;top:2px;width:0;height:0;z-index:2"><div style="width:14px;height:14px;background:'+color+';transform:rotate(45deg);border:2px solid #fecaca;margin-left:-7px;margin-top:4px"></div></div>';
+    // Bar
+    h+='<div class="bar" style="left:'+left+'%;width:'+w+'%;background:'+color+';opacity:.7">';
+    h+='<div class="bar-tooltip"><strong>'+ms.zone+' ('+ms.floor+')</strong><br>CDR Start: '+fmt(ms.start)+'<br>CDR Complete: '+fmt(ms.finish)+'<br>Duration: '+db(ms.start,ms.finish)+'d<br>D-day: D-'+daysLeft+'</div>';
+    h+='</div></div></div>';
+  });
+  h+='</div>';
+  
+  // Legend
+  h+='<div class="legend">';
+  h+='<div class="legend-item"><div style="width:10px;height:10px;background:#ef4444;transform:rotate(45deg);border:1px solid #fecaca"></div><span style="color:#fca5a5">URGENT (&lt;180d)</span></div>';
+  h+='<div class="legend-item"><div style="width:10px;height:10px;background:#f59e0b;transform:rotate(45deg);border:1px solid #fef3c7"></div><span style="color:#fcd34d">WATCH (180~365d)</span></div>';
+  h+='<div class="legend-item"><div style="width:10px;height:10px;background:#22c55e;transform:rotate(45deg);border:1px solid #d1fae5"></div><span style="color:#6ee7b7">ON TRACK (&gt;365d)</span></div>';
+  h+='<div class="legend-item"><div style="width:2px;height:14px;background:#3b82f6"></div>Today ('+fmt(STATUS_DATE)+')</div>';
+  h+='</div>';
+  
+  document.getElementById('main-content').innerHTML=h;
+}
+
+function showOverview(){
+  setActive('btn-overview');currentZone=null;currentEPC='ALL';
+  const allKeys=Object.keys(DATA.zones).sort();
+  let h='<div class="section-title">All Zones Overview</div>';
+  h+='<div class="overview-grid">';
+  allKeys.forEach(key=>{
+    const z=DATA.zones[key];const d=z.ALL;const ec=z.epc_counts;
+    const span=db(d.min_start,d.max_finish);const tot=(ec.E||0)+(ec.P||0)+(ec.C||0);
+    const msData=MILESTONES[key];const hasMS=msData&&msData.length>0;
+    h+='<div class="zone-card" onclick="currentZone=\''+key+'\';currentEPC=\'ALL\';showZone()" style="'+(hasMS?'border-color:#ef444480':'')+'">';
+    h+='<h4>'+z.zone+' <span class="floor-tag '+(z.floor==='FF'?'floor-ff':'floor-gf')+'">'+z.floor+'</span></h4>';
+    h+='<div class="info">'+fmt(d.min_start)+' ~ '+fmt(d.max_finish)+' ('+span+'d) | '+tot+' acts</div>';
+    if(hasMS){
+      const ms=msData[0];const daysLeft=db(STATUS_DATE,ms.start);
+      h+='<div class="ms-tag">&#9670; Eq.Move-in: '+fmt(ms.start)+' (D-'+daysLeft+')</div>';
+    }
+    h+='<div class="epc-bar">';
+    if(tot>0){h+='<div class="seg-e" style="width:'+((ec.E||0)/tot*100)+'%"></div><div class="seg-p" style="width:'+((ec.P||0)/tot*100)+'%"></div><div class="seg-c" style="width:'+((ec.C||0)/tot*100)+'%"></div>'}
+    h+='</div></div>';
+  });
+  h+='</div>';
+  document.getElementById('main-content').innerHTML=h;
+}
+
+function showComparison(){
+  setActive('btn-compare');currentZone=null;
+  const allKeys=Object.keys(DATA.zones).sort();
+  let h='<div class="section-title">EPC Phase Comparison by Zone</div>';
+  ['E','P','C'].forEach(epc=>{
+    const label={E:'Engineering (E)',P:'Procurement (P)',C:'Construction (C)'}[epc];
+    const color=EPC_COLORS[epc];
+    h+='<div style="margin:16px 0 8px;font-size:13px;font-weight:600;color:'+color+'">'+label+'</div>';
+    h+='<table class="compare-table"><tr><th>Zone</th><th>Floor</th><th>Start</th><th>Finish</th><th>Span</th><th>Acts</th><th>Eq.Move-in</th></tr>';
+    allKeys.forEach(key=>{
+      const z=DATA.zones[key];const d=z[epc];
+      const msData=MILESTONES[key];const msDate=msData&&msData.length?fmt(msData[0].start):'—';
+      if(!d){h+='<tr><td style="cursor:pointer;color:#60a5fa" onclick="currentZone=\''+key+'\';currentEPC=\''+epc+'\';showZone()">'+z.zone+'</td><td><span class="floor-tag '+(z.floor==='FF'?'floor-ff':'floor-gf')+'">'+z.floor+'</span></td><td colspan="4" style="color:#475569">N/A</td><td class="ms-date" style="font-size:11px">'+msDate+'</td></tr>';return}
+      const span=db(d.min_start,d.max_finish);
+      h+='<tr><td style="cursor:pointer;color:#60a5fa" onclick="currentZone=\''+key+'\';currentEPC=\''+epc+'\';showZone()">'+z.zone+'</td>';
+      h+='<td><span class="floor-tag '+(z.floor==='FF'?'floor-ff':'floor-gf')+'">'+z.floor+'</span></td>';
+      h+='<td>'+fmt(d.min_start)+'</td><td>'+fmt(d.max_finish)+'</td><td>'+span+'d</td><td>'+d.total+'</td>';
+      h+='<td style="color:#fca5a5;font-weight:700">'+msDate+'</td></tr>';
+    });
+    h+='</table>';
+  });
+  document.getElementById('main-content').innerHTML=h;
+}
+
+buildSidebar();showMilestoneTimeline();
+</script>
+</body>
+</html>
