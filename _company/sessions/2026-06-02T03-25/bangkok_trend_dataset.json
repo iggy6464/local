@@ -1,0 +1,102 @@
+[
+  {
+    "id": "BKK-2026-001",
+    "category": "Dining",
+    "name": "The Riveria Heritage",
+    "location": "Charoen Krung, Bang Rak",
+    "description": "올드 방콕의 고풍스러운 헤리티지 빌딩을 개조한 파인 다이닝. 태국 전통 식재료와 현대적 프렌치 기법의 조화가 일품.",
+    "target_persona": "문화적 깊이를 중시하는 4050 미식가 및 은퇴 준비층",
+    "trend_keyword": ["Heritage", "Fine-Dining", "Old-Town-Chic"],
+    "update_date": "2026-06-02"
+  },
+  {
+    "id": "BKK-2026-002",
+    "category": "Stay",
+    "name": "Aman Residence Sukhumvit",
+    "location": "Sukhumvit, Watthana",
+    "description": "도심 속 완벽한 고립을 제공하는 럭셔리 서비스 레지던스. 은퇴 후 거주를 고려할 만한 최고급 편의시설 완비.",
+    "target_persona": "럭셔리 라이프스타일을 지향하는 고자산 은퇴 희망자",
+    "trend_keyword": ["Luxury-Stay", "Urban-Retreat", "High-End"],
+    "update_date": "2026-06-02"
+  },
+  {
+    "id": "BKK-2026-003",
+    "category": "Lifestyle",
+    "name": "Green Oasis Wellness Center",
+    "location": "Thong Lor, Sukhumvit",
+    "description": "방콕 도심 내 위치한 프리미엄 웰니스 센터. 맞춤형 안티에이징 및 요가 프로그램을 제공하여 건강한 노후를 준비하는 이들에게 인기.",
+    "target_persona": "건강과 웰빙을 최우선 가치로 두는 액티브 시니어",
+    "trend_keyword": ["Wellness", "Longevity", "Thong-Lor"],
+    "update_date": "2026-06-02"
+  },
+  {
+    "id": "BKK-2026-004",
+    "category": "Dining",
+    "name": "Sky Garden Rooftop Bar",
+    "location": "Silom, Bang Rak",
+    "description": "방콕 스카이라인을 한눈에 담는 루프탑. 세련된 칵테일과 함께 도시의 활력을 느낄 수 있는 곳.",
+    "target_persona": "도시적 세련미를 즐기는 40대 중후반 트렌드 세터",
+    "trend_keyword": ["Rooftop-Bar", "Cityscape", "Socializing"],
+    "update_date": "2026-06-02"
+  },
+  {
+    "id": "BKK-2026-005",
+    "category": "Lifestyle",
+    "name": "Artisan Collective Studio",
+    "location": "Ari, Phaya Thai",
+    "description": "로컬 아티스트들과 협업하는 예술 공방. 취미를 통해 삶의 질을 높이려는 은퇴 준비층에게 영감을 주는 커뮤니티 공간.",
+    "target_persona": "예술적 소양과 창의적 활동을 중시하는 은퇴 희망자",
+    "trend_keyword": ["Art-Community", "Ari-Vibe", "Creative-Life"],
+    "update_date": "2026-06-02"
+  },
+  {
+    "id": "BKK-2026-006",
+    "category": "Dining",
+    "name": "Organic Soul Kitchen",
+    "location": "Ekkamai, Sukhumvit",
+    "description": "Farm-to-table 원칙을 고수하는 유기농 다이닝. 신선한 로컬 식재료를 통해 건강한 미식 경험을 제공.",
+    "target_persona": "신체적 건강과 자연 친화적 식단을 선호하는 층",
+    "trend_keyword": ["Farm-to-Table", "Organic", "Healthy-Eating"],
+    "update_date": "2026-06-02"
+  },
+  {
+    "id": "BKK-2026-007",
+    "category": "Stay",
+    "name": "Riverside Boutique Villa",
+    "location": "Riverside, Chao Phraya",
+    "description": "짜오프라야 강변의 프라이빗 빌라. 조용한 휴식과 강변 산책을 즐길 수 있는 독채형 고급 숙소.",
+    "target_persona": "프라이버시와 자연 경관을 중시하는 부부 단위 여행객",
+    "trend_keyword": ["Riverside-Living", "Private-Villa", "Serenity"],
+    "update_date": "2026-06-02"
+  },
+  {
+    "id": "BKK-2026-008",
+    "category": "Lifestyle",
+    "name": "The Zen Club Bangkok",
+    "location": "Sathorn, Bang Rak",
+    "description": "프라이빗 멤버십 기반의 커뮤니티 클럽. 비즈니스 네트워킹과 고급 취미 공유가 이루어지는 곳.",
+    "target_persona": "사회적 관계와 네트워킹을 유지하고자 하는 은퇴층",
+    "trend_keyword": ["Membership-Club", "Networking", "Sathorn-Elite"],
+    "update_date": "2026-06-02"
+  },
+  {
+    "id": "BKK-2026-009",
+    "category": "Sightseeing",
+    "name": "Modern Museum of Bangkok",
+    "location": "Pathum Wan, Central",
+    "description": "태국의 현대 미술과 역사를 큐레이팅하는 디지털 아트 뮤지엄. 세련된 시각적 경험 제공.",
+    "target_persona": "교양과 지적 탐구심이 강한 스마트 시니어",
+    "trend_keyword": ["Digital-Art", "Museum-Culture", "Smart-Travel"],
+    "update_date": "2026-06-02"
+  },
+  {
+    "id": "BKK-2026-010",
+    "category": "Dining",
+    "name": "Spice Route Fusion",
+    "location": "Phrom Phong, Sukhumvit",
+    "description": "동남아시아 전역의 향신료를 재해석한 퓨전 다이닝. 실험적이고 화려한 맛의 향연.",
+    "target_persona": "새로운 미식 경험에 열려 있는 모험적인 중장년층",
+    "trend_keyword": ["Fusion-Cuisine", "Spicy-Trend", "Phrom-Phong"],
+    "update_date": "2026-06-02"
+  }
+]
