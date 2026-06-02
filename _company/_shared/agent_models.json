@@ -1,6 +1,11 @@
 {
-  "developer": "qwen3.5-4b-claude-4.6-opus-reasoning-distilled-v2-oq8",
+  "developer": "supergemma4-26b-uncensored-mlx-v2",
   "business": "supergemma4-26b-uncensored-mlx-v2",
   "secretary": "supergemma4-26b-uncensored-mlx-v2",
-  "researcher": "supergemma4-26b-uncensored-mlx-v2"
+  "researcher": "supergemma4-26b-uncensored-mlx-v2",
+  "writer": "supergemma4-26b-uncensored-mlx-v2",
+  "editor": "supergemma4-26b-uncensored-mlx-v2",
+  "designer": "supergemma4-26b-uncensored-mlx-v2",
+  "youtube": "supergemma4-26b-uncensored-mlx-v2",
+  "instagram": "supergemma4-26b-uncensored-mlx-v2"
 }

@@ -12,3 +12,4 @@ _CEO 에이전트만 읽고 쓰는 개인 노트. 학습·교훈·자주 쓰는 
 - [2026-06-02] 데이터 가져오는 중에서 정지된거 같은데? → 보고서 sessions/2026-06-02T03-16/_report.md
 - [2026-06-02] 📥 새 지식 입수 — **index.html**: <!DOCTYPE html> (출처: 00_Raw/2026-06-02/index.html)
 - [2026-06-02] CEO응답실퍠라는데? → 보고서 sessions/2026-06-02T04-54/_report.md
+- [2026-06-02] 같은 오류가 계속 나는데? 평가: 완료 — 현재까지의 성과를 KPI 관점을 분석하고 미래 가치를 예측하여 보고함.ㄴ_z_l_k_j_h_g_f_d_s_a_p_o_i_u_y_t_r_e_w_q_z_x_c_v_b_n_m / 2026-06-02T10:30/business_evaluation.md </reveal_in_explorer> → 보고서 sessions/2026-06-02T04-59/_report.md
