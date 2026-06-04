@@ -1,11 +1,11 @@
 {
-  "developer": "supergemma4-26b-uncensored-mlx-v2",
-  "business": "supergemma4-26b-uncensored-mlx-v2",
-  "secretary": "supergemma4-26b-uncensored-mlx-v2",
-  "researcher": "supergemma4-26b-uncensored-mlx-v2",
-  "writer": "supergemma4-26b-uncensored-mlx-v2",
-  "editor": "supergemma4-26b-uncensored-mlx-v2",
-  "designer": "supergemma4-26b-uncensored-mlx-v2",
-  "youtube": "supergemma4-26b-uncensored-mlx-v2",
-  "instagram": "supergemma4-26b-uncensored-mlx-v2"
+  "developer": "qwen3.5-9b-mlx",
+  "business": "qwen3.5-9b-mlx",
+  "secretary": "qwen3.5-9b-mlx",
+  "researcher": "qwen3.5-9b-mlx",
+  "writer": "qwen3.5-9b-mlx",
+  "editor": "qwen3.5-9b-mlx",
+  "designer": "qwen3.5-9b-mlx",
+  "youtube": "qwen3.5-9b-mlx",
+  "instagram": "qwen3.5-9b-mlx"
 }
