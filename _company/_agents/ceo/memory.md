@@ -19,3 +19,4 @@ _CEO 에이전트만 읽고 쓰는 개인 노트. 학습·교훈·자주 쓰는 
 - [2026-06-04] /**  * BKK BEYOND - Bi-weekly Content Archiving & Social Ingestion Utility  * Run with: node scripts/archive_utility.js  */  const fs = require('fs'); const path = require('path');  // 경로 설정 const dbPath = path.join(__dirname, '../data/bkk_content.json');  // [기능 추가] TikTok & Instagram 트렌드 데이터 수집 로직
 - [2026-06-04] /**  * BKK BEYOND - Bi-weekly Content Archiving & Social Ingestion Utility (Robust Version)  */ const fs = require('fs'); const path = require('path');  // 경로 설정 const dbPath = path.join(__dirname, '../data/bkk_content.json');  // [개선] 다국어 번역 스키마가 완벽하게 일치하는지 검증하기 위한 헬퍼 함수 function validateTranslatio
 - [2026-06-04] 위 내용은 전부 어디에 저장되어 있지? → 보고서 sessions/2026-06-04T04-40/_report.md
+- [2026-06-04] 파일 저장경로를 알려줘 → 보고서 sessions/2026-06-04T04-42/_report.md
