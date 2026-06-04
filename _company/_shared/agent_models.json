@@ -1,11 +1,11 @@
 {
-  "developer": "qwen3.5-9b-mlx",
-  "business": "qwen3.5-9b-mlx",
-  "secretary": "qwen3.5-9b-mlx",
-  "researcher": "qwen3.5-9b-mlx",
-  "writer": "qwen3.5-9b-mlx",
-  "editor": "qwen3.5-9b-mlx",
-  "designer": "qwen3.5-9b-mlx",
-  "youtube": "qwen3.5-9b-mlx",
-  "instagram": "qwen3.5-9b-mlx"
+  "developer": "gemma4-12b-it-abliterated",
+  "business": "gemma4-12b-it-abliterated",
+  "secretary": "gemma4-12b-it-abliterated",
+  "researcher": "gemma4-12b-it-abliterated",
+  "writer": "gemma4-12b-it-abliterated",
+  "editor": "gemma4-12b-it-abliterated",
+  "designer": "gemma4-12b-it-abliterated",
+  "instagram": "gemma4-12b-it-abliterated",
+  "youtube": "gemma4-12b-it-abliterated"
 }
