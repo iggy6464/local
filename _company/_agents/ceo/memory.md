@@ -16,3 +16,4 @@ _CEO 에이전트만 읽고 쓰는 개인 노트. 학습·교훈·자주 쓰는 
 - [2026-06-04] 최신 틱톡이나 밈을 검색할 수 있어야 함..그걸 웹페이지에 2주일에 한 번씩 업데이트하여 자동으로 컨텐츠를 만드는 기능이 필요함 → 보고서 sessions/2026-06-04T02-20/_report.md
 - [2026-06-04] [자율 사이클 — 2026-06-04] 1인 기업 24시간 운영 중. 회사 목표·각 에이전트의 개인 목표(_agents/{id}/goal.md)·최근 의사결정·메모리를 검토해서 지금 가장 가치 있는 단일 작업 1개를 결정하고, 적절한 1~2명 에이전트에게 분배해서 실행하세요. 같은 산출물을 반복하지 마세요 — 메모리에 비슷한 항목이 24시간 내에 있으면 다른 각도로 진전시키세요. → 보고서 sessions/2026-06-04T03-42/_report.md
 - [2026-06-04] 이제껏 내용을 json으로 만들어줘 → 보고서 sessions/2026-06-04T04-25/_report.md
+- [2026-06-04] /**  * BKK BEYOND - Bi-weekly Content Archiving & Social Ingestion Utility  * Run with: node scripts/archive_utility.js  */  const fs = require('fs'); const path = require('path');  // 경로 설정 const dbPath = path.join(__dirname, '../data/bkk_content.json');  // [기능 추가] TikTok & Instagram 트렌드 데이터 수집 로직
