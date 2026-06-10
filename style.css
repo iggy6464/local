@@ -157,6 +157,11 @@ ul {
   transform: translateY(-2px);
 }
 
+.btn:active {
+  transform: translateY(-1px) scale(0.97);
+  box-shadow: 0 4px 12px rgba(197, 168, 128, 0.2);
+}
+
 /* --- HEADER / NAVIGATION --- */
 .header {
   position: fixed;
@@ -403,11 +408,17 @@ ul {
 
 .quiz-card {
   display: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 .quiz-card.active {
   display: block;
   animation: slideInRight 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.quiz-card.fade-out {
+  opacity: 0;
+  transform: translateX(-20px);
 }
 
 .quiz-question-num {
@@ -577,6 +588,7 @@ ul {
 
 .curation-content {
   position: relative;
+  transition: opacity 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .tab-panel {
@@ -643,6 +655,7 @@ ul {
   border: 1px solid var(--color-border);
   border-radius: 16px;
   transition: var(--transition-smooth);
+  cursor: pointer;
 }
 
 .spot-mini-card:hover {
@@ -802,6 +815,12 @@ ul {
 .secret-item {
   display: flex;
   gap: 1.8rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.secret-item:hover {
+  transform: translateX(10px);
 }
 
 .secret-icon {
@@ -816,6 +835,13 @@ ul {
   color: var(--color-gold);
   font-size: 1.2rem;
   flex-shrink: 0;
+  transition: var(--transition-smooth);
+}
+
+.secret-item:hover .secret-icon {
+  background: var(--color-gold);
+  color: var(--color-bg-dark);
+  transform: scale(1.1);
 }
 
 .secret-item-detail h4 {
@@ -1045,11 +1071,13 @@ ul {
 .form-message.success {
   display: block;
   color: hsl(120, 50%, 65%);
+  animation: fadeInDown 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
 }
 
 .form-message.error {
   display: block;
   color: hsl(0, 70%, 65%);
+  animation: fadeInDown 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
 }
 
 /* --- FOOTER --- */

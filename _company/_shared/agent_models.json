@@ -1,11 +1,11 @@
 {
-  "developer": "google/gemma-4-12b-qat",
-  "business": "google/gemma-4-12b-qat",
-  "secretary": "google/gemma-4-12b-qat",
-  "researcher": "google/gemma-4-12b-qat",
-  "writer": "google/gemma-4-12b-qat",
-  "editor": "google/gemma-4-12b-qat",
-  "designer": "google/gemma-4-12b-qat",
-  "instagram": "google/gemma-4-12b-qat",
-  "youtube": "google/gemma-4-12b-qat"
+  "developer": "google/gemma-4-26b-a4b-qat",
+  "business": "google/gemma-4-26b-a4b-qat",
+  "secretary": "google/gemma-4-26b-a4b-qat",
+  "researcher": "google/gemma-4-26b-a4b-qat",
+  "writer": "google/gemma-4-26b-a4b-qat",
+  "editor": "google/gemma-4-26b-a4b-qat",
+  "designer": "google/gemma-4-26b-a4b-qat",
+  "instagram": "google/gemma-4-26b-a4b-qat",
+  "youtube": "google/gemma-4-26b-a4b-qat"
 }

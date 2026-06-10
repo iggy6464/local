@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
       "newsletter.desc": "가이드북에는 절대 실리지 않는, 오직 현지 Gen Z 아티스트와 10회차 이상 베테랑들만 공유하는 **‘비밀 구글 맵 리스트 레이어’**와 매주 새로운 골목 정보가 실리는 뉴스레터를 지금 무료로 받아보세요.",
       "newsletter.placeholder": "이메일 주소를 입력해 주세요",
       "newsletter.btn": "비밀 지도 받기",
+      "newsletter.sending": "전송 중...",
       "newsletter.success": "🎉 축하합니다! 방콕 비밀 구글맵 레이어 지도 링크가 성공적으로 전송되었습니다! 이메일함을 확인해 주세요.",
       "newsletter.error": "올바른 이메일 주소를 입력해 주세요.",
 
@@ -113,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
       "newsletter.desc": "Subscribe to receive our exclusive Google Maps Layer—never published in guidebooks—curated by Gen Z artists, along with weekly local hotspot newsletters.",
       "newsletter.placeholder": "Enter your email address",
       "newsletter.btn": "Get Secret Map",
+      "newsletter.sending": "Sending...",
       "newsletter.success": "🎉 Congratulations! The secret Google Maps link has been sent to your email. Check your inbox!",
       "newsletter.error": "Please enter a valid email address.",
 
@@ -173,6 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
       "newsletter.desc": "สมัครรับแผนที่กูเกิลแมพเวอร์ชันพิเศษ—ที่ไม่มีในไกด์บุ๊กทั่วไป—รวบรวมโดยศิลปิน Gen Z พร้อมจดหมายข่าวอัปเดตสปอตใหม่รายสัปดาห์",
       "newsletter.placeholder": "กรุณากรอกอีเมลของคุณ",
       "newsletter.btn": "รับแผนที่ลับ",
+      "newsletter.sending": "กำลังส่ง...",
       "newsletter.success": "🎉 ยินดีด้วย! ส่งลิงก์แผนที่ลับเรียบร้อยแล้ว กรุณาตรวจสอบกล่องข้อความในอีเมลของคุณ!",
       "newsletter.error": "กรุณากรอกอีเมลให้ถูกต้อง",
 
@@ -422,6 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  let currentLang = localStorage.getItem('bkk_beyond_lang') || 'ko';
   let curationData = null;
   let currentVersion = 'current';
 
@@ -437,8 +441,6 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error("Failed to load curation database, running fallback:", err);
       translatePage(currentLang);
     });
-
-  let currentLang = localStorage.getItem('bkk_beyond_lang') || 'ko';
 
 
   /* ==========================================================================
@@ -619,14 +621,20 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.classList.add('selected');
         
         setTimeout(() => {
-          currentStep++;
-          updateProgressBar();
+          qBox.classList.add('fade-out');
           
-          if (currentStep < quizQuestions[currentLang].length) {
-            renderQuizQuestion();
-          } else {
-            showQuizResults();
-          }
+          setTimeout(() => {
+            currentStep++;
+            updateProgressBar();
+            
+            if (currentStep < quizQuestions[currentLang].length) {
+              renderQuizQuestion();
+              qBox.classList.remove('fade-out');
+            } else {
+              showQuizResults();
+              qBox.classList.remove('fade-out');
+            }
+          }, 250);
         }, 350);
       });
       
@@ -785,12 +793,30 @@ document.addEventListener('DOMContentLoaded', () => {
   if (newsletterForm) {
     newsletterForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const email = document.getElementById('user-email').value;
+      const emailInput = document.getElementById('user-email');
+      const submitBtn = newsletterForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerText;
+      const email = emailInput.value;
 
       if (email) {
-        formMsg.innerText = translations[currentLang]["newsletter.success"];
-        formMsg.className = "form-message success";
-        document.getElementById('user-email').value = "";
+        // Disable controls and show sending state
+        emailInput.disabled = true;
+        submitBtn.disabled = true;
+        submitBtn.innerText = translations[currentLang]["newsletter.sending"] || "Sending...";
+        formMsg.style.display = 'none';
+        formMsg.className = "form-message";
+
+        setTimeout(() => {
+          // Re-enable controls and restore original text
+          emailInput.disabled = false;
+          submitBtn.disabled = false;
+          submitBtn.innerText = translations[currentLang]["newsletter.btn"] || originalText;
+
+          // Set success message and reset input
+          formMsg.innerText = translations[currentLang]["newsletter.success"];
+          formMsg.className = "form-message success";
+          emailInput.value = "";
+        }, 1200);
       } else {
         formMsg.innerText = translations[currentLang]["newsletter.error"];
         formMsg.className = "form-message error";
@@ -824,6 +850,35 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ==========================================================================
      11. INITIALIZATION RUN
      ========================================================================== */
+  // Bind dynamic Google Maps search on click for curation spots
+  const spotCards = document.querySelectorAll('.spot-mini-card');
+  spotCards.forEach(card => {
+    card.addEventListener('click', () => {
+      const h4 = card.querySelector('h4');
+      if (h4) {
+        const placeName = h4.innerText.trim();
+        let mapUrl;
+        if (placeName.toLowerCase().includes('mother roaster')) {
+          mapUrl = 'https://maps.app.goo.gl/RMsbdZuwWaVVX7Uh8';
+        } else {
+          mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeName)}`;
+        }
+        window.open(mapUrl, '_blank', 'noopener,noreferrer');
+      }
+    });
+  });
+  // Bind dynamic Google Maps search on click for midnight secret items
+  const secretItems = document.querySelectorAll('.secret-item');
+  secretItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const h4 = item.querySelector('h4');
+      if (h4) {
+        const placeName = h4.innerText.trim();
+        const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeName)}`;
+        window.open(mapUrl, '_blank', 'noopener,noreferrer');
+      }
+    });
+  });
   const defaultLangBtn = document.querySelector(`.lang-btn[data-lang="${currentLang}"]`);
   if (defaultLangBtn) {
     langBtns.forEach(b => b.classList.remove('active'));
